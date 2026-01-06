@@ -339,7 +339,7 @@
       font-size:13px;
     }
 
-    /* Waiver chips */
+    /* Waiver */
     .miniRow{display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
     @media (max-width: 680px){ .miniRow{grid-template-columns:1fr} }
     .warnBox{
@@ -351,6 +351,17 @@
       font-size:12.5px;
       line-height:1.35;
     }
+
+    footer{
+      border-top:1px solid var(--line);
+      background: rgba(7,11,20,.6);
+      color: var(--muted);
+      font-size:12px;
+      padding:14px 16px;
+    }
+    footer .wrap{padding:0 16px}
+    .copyRow{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:center;max-width:1180px;margin:0 auto;}
+    .copyRow b{color:var(--text);font-weight:700}
   </style>
 </head>
 
@@ -399,7 +410,7 @@
           </div>
         </div>
 
-        <!-- NEW: Collapsible Training History / Waiver -->
+        <!-- Collapsible Training History / Waiver -->
         <div class="sectionTitle">Training History & Waiver</div>
         <details id="waiverDetails">
           <summary>
@@ -465,8 +476,7 @@
             <div class="sectionTitle" style="margin-top:0;">Waiver acknowledgment</div>
             <div class="warnBox">
               This screening is not a medical diagnosis. If you are at high risk, have unresolved pain, or are advised to obtain medical clearance,
-              you should consult a qualified healthcare professional before starting or progressing exercise.
-              Coaching guidance is provided based on the information you disclose.
+              consult a qualified healthcare professional before starting or progressing exercise. Coaching guidance is based on information disclosed.
             </div>
 
             <div style="height:10px"></div>
@@ -558,6 +568,9 @@
         <div class="sectionTitle">Quick flags</div>
         <div id="flagTags"></div>
 
+        <div class="sectionTitle">Recommended Mobility / Stability Exercises</div>
+        <div class="summaryBox" id="recBox">Fill in the assessment to generate recommendations.</div>
+
         <div class="sectionTitle">Auto-generated summary</div>
         <div class="summaryBox" id="summaryBox">Fill in the assessment to generate a summary.</div>
 
@@ -579,7 +592,19 @@
   </div>
 </main>
 
+<footer>
+  <div class="copyRow">
+    <div>© <span id="yr"></span> <b>Dr. Ng Jun Wei, EdD, MSc, BSc, CSCS, CRGA</b></div>
+    <div>Runner Readiness Assessment • For coaching/education use</div>
+  </div>
+</footer>
+
 <script>
+  // =========================================================
+  // BRAND / COPYRIGHT
+  // =========================================================
+  const COPYRIGHT = "© " + new Date().getFullYear() + " Dr. Ng Jun Wei, EdD, MSc, BSc, CSCS, CRGA";
+
   // =========================================================
   // CONFIG
   // =========================================================
@@ -611,7 +636,73 @@
     { key: "pronation", label: "Pronation inability", glyph: "⤵︎" }
   ];
 
-  const STORAGE_KEY = "runner_readiness_assessment_v6";
+  const STORAGE_KEY = "runner_readiness_assessment_v7";
+
+  // =========================================================
+  // RECOMMENDATION LIBRARY (lightweight + practical)
+  // =========================================================
+  const RECS = {
+    movement: {
+      toe_touch: {
+        mobility: ["Hamstring floss (banded) 2×10/side", "Supine hamstring stretch 2×30–45s/side", "Hip hinge patterning with dowel 2×8"],
+        stability: ["Dead bug (controlled) 2×6–8/side", "Bird-dog (slow) 2×6/side"]
+      },
+      back_bend: {
+        mobility: ["Half-kneeling hip flexor stretch 2×30–45s/side", "Thoracic extension over foam roller 2×6–8", "Prone press-up (as tolerated) 2×8"],
+        stability: ["Glute bridge hold 3×20–30s", "Side plank (knees) 2×20–30s/side"]
+      },
+      rotation: {
+        mobility: ["Open books (thoracic rotation) 2×8/side", "90/90 hip switches 2×6/side", "Hip IR/ER stretch 2×30s/side"],
+        stability: ["Pallof press 2×8–10/side", "Split-stance anti-rotation hold 2×20s/side"]
+      },
+      single_leg_balance: {
+        mobility: ["Ankle dorsiflexion rocks 2×10/side", "Toe yoga (lift big toe/others) 2×8"],
+        stability: ["Single-leg balance (eyes open) 3×20–30s", "Short-foot exercise 2×8–10", "Single-leg RDL reach (light) 2×6/side"]
+      },
+      squat: {
+        mobility: ["Knee-to-wall ankle DF drill 2×10/side", "Couch stretch (hip flexor) 2×30s/side", "Adductor rock-backs 2×8/side"],
+        stability: ["Goblet squat to box (control) 2×6–8", "Mini-band lateral steps 2×10/side", "Tempo squat (3s down) 2×5"]
+      }
+    },
+    strength: {
+      bridge: {
+        stability: ["Glute bridge iso hold 3×20–30s", "Marching bridge 2×6/side"],
+        mobility: ["Hip flexor stretch 2×30s/side"]
+      },
+      side_plank: {
+        stability: ["Side plank (knees) 3×15–25s/side", "Side-lying hip abduction 2×10/side"],
+        mobility: ["QL/lat gentle stretch 2×20s/side"]
+      },
+      sl_sit_to_stand: {
+        stability: ["Single-leg sit-to-stand to higher box 2×5/side", "Step-down (slow) 2×6/side", "Split squat (supported) 2×6/side"],
+        mobility: ["Ankle DF drill 2×10/side"]
+      },
+      calf_raise: {
+        stability: ["Single-leg calf raise (support) 3×6–10/side", "Eccentric heel drop 2×8/side"],
+        mobility: ["Calf stretch (gastroc/soleus) 2×30s/side"]
+      }
+    },
+    foot: {
+      toe_splay: {
+        mobility: ["Toe splay practice 2×8", "Toe spacers (if tolerated) 5–10 min"],
+        stability: ["Short-foot exercise 2×8–10", "Single-leg balance with tripod foot 2×20s/side"]
+      },
+      great_toe_extension: {
+        mobility: ["Great toe extension stretch 2×30s/side", "Plantar fascia roll 1–2 min/foot"],
+        stability: ["Towel scrunches 2×10", "Calf raises focusing on big toe pressure 2×8–10"]
+      },
+      great_toe_abduction: {
+        mobility: ["Toe yoga (big toe up/down) 2×8", "Manual big-toe abduction stretch 2×20s"],
+        stability: ["Short-foot + big toe press 2×8", "Band-resisted toe abduction 2×8–10"]
+      }
+    },
+    ankleRom: {
+      eversion: { mobility:["Banded ankle eversion 2×10/side", "Peroneal soft tissue release 1–2 min"], stability:["Single-leg balance (tripod) 2×20s/side"] },
+      inversion: { mobility:["Banded ankle inversion 2×10/side", "Posterior tib activation (band) 2×10"], stability:["Arch control holds 2×20s/side"] },
+      supination:{ mobility:["Foot mobility circles 2×6 each direction", "Midfoot mobilization (gentle) 1–2 min"], stability:["Short-foot exercise 2×8–10"] },
+      pronation:{ mobility:["Calf/soleus stretch 2×30s/side", "Ankle DF knee-to-wall 2×10"], stability:["Tibialis posterior raises 2×10", "Single-leg balance 2×20s/side"] }
+    }
+  };
 
   // =========================================================
   // STATE
@@ -905,7 +996,7 @@
   }
 
   // =========================================================
-  // NEW: Waiver / training history collect + apply
+  // Waiver collect + apply
   // =========================================================
   function collectWaiver(){
     return {
@@ -939,6 +1030,108 @@
     setVal("signatureDate", w.signatureDate || "");
     const det = document.getElementById("waiverDetails");
     if(det) det.open = (w.waiverOpen === "Yes");
+  }
+
+  // =========================================================
+  // Recommendations generator
+  // =========================================================
+  function uniq(arr){
+    const out = [];
+    const seen = new Set();
+    for(const x of arr){
+      const k = String(x).trim();
+      if(!k) continue;
+      if(seen.has(k)) continue;
+      seen.add(k);
+      out.push(k);
+    }
+    return out;
+  }
+
+  function collectRecommendations(){
+    // returns { mobility:[], stability:[], notes:[] }
+    const mobility = [];
+    const stability = [];
+    const notes = [];
+
+    // Movement: if unable -> use both; if limitation suggests "control" -> emphasize stability, else mobility+stability
+    MOVEMENT.forEach(m => {
+      const unable = getToggle(`mv__${m.key}__unable`);
+      if(!unable) return;
+
+      const lib = RECS.movement[m.key];
+      if(lib?.mobility) mobility.push(...lib.mobility);
+      if(lib?.stability) stability.push(...lib.stability);
+
+      const limits = STATE.movementLimits[m.key] || [];
+      if(limits.length){
+        notes.push(`${m.label} limitations: ${limits.join(", ")}`);
+        // small heuristic: if any limitation has "control" or "form" -> prioritize stability
+        if(limits.some(x => /control|form/i.test(x))){
+          stability.push("Add 1–2 anti-rotation / core control drills (Pallof, dead bug) 2–3×/week");
+        }
+      }
+    });
+
+    // Strength: if unable L/R -> stability exercises
+    STRENGTH.forEach(it => {
+      const uL = getToggle(`st__${it.key}__unable__L`);
+      const uR = getToggle(`st__${it.key}__unable__R`);
+      if(!(uL||uR)) return;
+      const lib = RECS.strength[it.key];
+      if(lib?.stability) stability.push(...lib.stability);
+      if(lib?.mobility) mobility.push(...lib.mobility);
+      notes.push(`${it.label} unable: ${(uL&&uR)?"L+R":(uL?"L":"R")}`);
+    });
+
+    // Foot: if unable -> mix
+    FOOT.forEach(it => {
+      const uL = getToggle(`ft__${it.key}__unable__L`);
+      const uR = getToggle(`ft__${it.key}__unable__R`);
+      if(!(uL||uR)) return;
+      const lib = RECS.foot[it.key];
+      if(lib?.mobility) mobility.push(...lib.mobility);
+      if(lib?.stability) stability.push(...lib.stability);
+      notes.push(`${it.label} unable: ${(uL&&uR)?"L+R":(uL?"L":"R")}`);
+    });
+
+    // Ankle ROM: inability -> mobility + stability from mapping
+    ANKLE_ROM.forEach(r => {
+      const L = getToggle(`ank__${r.key}__L`);
+      const R = getToggle(`ank__${r.key}__R`);
+      if(!(L||R)) return;
+      const lib = RECS.ankleRom[r.key];
+      if(lib?.mobility) mobility.push(...lib.mobility);
+      if(lib?.stability) stability.push(...lib.stability);
+      notes.push(`${r.label}: ${(L&&R)?"L+R":(L?"L":"R")}`);
+    });
+
+    return {
+      mobility: uniq(mobility),
+      stability: uniq(stability),
+      notes: uniq(notes)
+    };
+  }
+
+  function formatRecsText(recs){
+    const lines = [];
+    if(!recs.mobility.length && !recs.stability.length){
+      return "No recommendations yet.\nTip: mark any area as Unable to generate targeted mobility/stability suggestions.";
+    }
+    lines.push("Mobility focus");
+    lines.push(...(recs.mobility.length ? recs.mobility.map(x => `- ${x}`) : ["- (none)"]));
+    lines.push("");
+    lines.push("Stability / Control focus");
+    lines.push(...(recs.stability.length ? recs.stability.map(x => `- ${x}`) : ["- (none)"]));
+    if(recs.notes.length){
+      lines.push("");
+      lines.push("Triggers");
+      lines.push(...recs.notes.map(x => `- ${x}`));
+    }
+    lines.push("");
+    lines.push("Programming hint");
+    lines.push("- Choose 2–4 drills total, 2–4×/week. Keep pain-free, progress gradually.");
+    return lines.join("\n");
   }
 
   // =========================================================
@@ -1049,7 +1242,7 @@
   }
 
   // =========================================================
-  // Summary
+  // Summary + Flags + Recs
   // =========================================================
   function sideText(L,R){
     if(L && R) return "L+R";
@@ -1129,9 +1322,7 @@
 
     // Waiver summary first
     const wLines = waiverSummaryLines();
-    if(wLines.length){
-      lines.push(...wLines);
-    }
+    if(wLines.length) lines.push(...wLines);
 
     lines.push("Movement");
     MOVEMENT.forEach(m => {
@@ -1186,6 +1377,9 @@
       lines.push(notes);
     }
 
+    lines.push("");
+    lines.push(COPYRIGHT);
+
     return lines.join("\n");
   }
 
@@ -1215,8 +1409,6 @@
 
     // Flags (include waiver risk flags)
     const tags = [];
-
-    // waiver risk flags
     const sf = getVal("stressFracture");
     const mc = getVal("medicalClearance");
     const proc = getVal("waiverProceed");
@@ -1254,6 +1446,10 @@
     // Summary box
     document.getElementById("summaryBox").textContent = buildSummaryText();
 
+    // Recommendations box
+    const recs = collectRecommendations();
+    document.getElementById("recBox").textContent = formatRecsText(recs);
+
     // Autosave
     if(document.getElementById("autosave").checked){
       save();
@@ -1261,10 +1457,25 @@
   }
 
   // =========================================================
-  // PDF export (includes waiver page)
+  // PDF footer helper
+  // =========================================================
+  function pdfFooter(doc, pageNo, totalPages){
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
+    const w = doc.internal.pageSize.getWidth();
+    const h = doc.internal.pageSize.getHeight();
+    doc.text(COPYRIGHT, 40, h - 28);
+    doc.text(`Page ${pageNo} / ${totalPages}`, w - 90, h - 28);
+  }
+
+  // =========================================================
+  // PDF export (includes recommendations + copyright)
   // =========================================================
   function pdfExport(){
     const data = collectAll();
+    const recs = collectRecommendations();
+    const recText = formatRecsText(recs);
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
 
@@ -1384,24 +1595,38 @@
       margin: { left: 40, right: 40 }
     });
 
+    // Recommendations page
+    doc.addPage();
+    doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+    doc.text("Recommended Mobility / Stability Exercises", 40, 60);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+    doc.text(doc.splitTextToSize(recText, 515), 40, 84);
+
     // Summary page
     doc.addPage();
     doc.setFont("helvetica", "bold"); doc.setFontSize(13);
     doc.text("Summary", 40, 60);
     doc.setFont("helvetica", "normal"); doc.setFontSize(10);
     const summary = buildSummaryText();
-    const sumLines = doc.splitTextToSize(summary, 515);
-    doc.text(sumLines, 40, 80);
+    doc.text(doc.splitTextToSize(summary, 515), 40, 84);
+
+    // Add footer on all pages
+    const total = doc.getNumberOfPages();
+    for(let p=1; p<=total; p++){
+      doc.setPage(p);
+      pdfFooter(doc, p, total);
+    }
 
     const base = ((caseId !== "—" ? caseId : (client !== "—" ? client : "assessment"))).replace(/[^\w\-]+/g, "_");
     doc.save(`${base}_runner_readiness_${new Date().toISOString().slice(0,10)}.pdf`);
   }
 
   // =========================================================
-  // XLSX export (includes waiver sheet)
+  // XLSX export (includes recommendations sheet + copyright)
   // =========================================================
   function xlsxExport(){
     const data = collectAll();
+    const recs = collectRecommendations();
     const wb = XLSX.utils.book_new();
 
     // Meta
@@ -1410,7 +1635,9 @@
       ["Client Name", data.meta.clientName || ""],
       ["Assessment Date", data.meta.assessDate || ""],
       ["Case ID", data.meta.caseId || ""],
-      ["Saved At (ISO)", data.meta.savedAtISO || ""]
+      ["Saved At (ISO)", data.meta.savedAtISO || ""],
+      [],
+      ["Copyright", COPYRIGHT]
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metaRows), "Meta");
 
@@ -1481,13 +1708,36 @@
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ankAoa), "Ankle ROM");
 
+    // Recommendations (NEW)
+    const recAoa = [
+      ["Recommended Mobility / Stability Exercises", ""],
+      [],
+      ["Mobility focus", ""],
+      ...(recs.mobility.length ? recs.mobility.map(x => ["- " + x, ""]) : [["- (none)", ""]]),
+      [],
+      ["Stability / Control focus", ""],
+      ...(recs.stability.length ? recs.stability.map(x => ["- " + x, ""]) : [["- (none)", ""]]),
+      [],
+      ["Triggers", ""],
+      ...(recs.notes.length ? recs.notes.map(x => ["- " + x, ""]) : [["- (none)", ""]]),
+      [],
+      ["Programming hint", ""],
+      ["- Choose 2–4 drills total, 2–4×/week. Keep pain-free, progress gradually.", ""],
+      [],
+      ["Copyright", COPYRIGHT]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(recAoa), "Recommendations");
+
     // Notes + Summary
     const nsAoa = [
       ["Coach Notes"],
       [getVal("notes") || ""],
       [],
       ["Auto Summary"],
-      [buildSummaryText()]
+      [buildSummaryText()],
+      [],
+      ["Copyright"],
+      [COPYRIGHT]
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nsAoa), "Notes & Summary");
 
@@ -1515,12 +1765,13 @@
       if(autosave.checked) save();
     });
 
-    // any input/select/textarea changes update summary + autosave
     document.addEventListener("input", onAnyChange);
     document.addEventListener("change", onAnyChange);
   }
 
   function init(){
+    document.getElementById("yr").textContent = new Date().getFullYear();
+
     document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
     document.getElementById("signatureDate").value = new Date().toISOString().slice(0,10);
 
@@ -1531,6 +1782,13 @@
 
     wire();
     onAnyChange();
+  }
+
+  // Save/Load need these functions after wire() but before init() calls them:
+  function updateSavedPill(iso){
+    const pill = document.getElementById("lastSaved");
+    if(!iso){ pill.textContent = "Not saved yet"; return; }
+    pill.textContent = `Saved: ${new Date(iso).toLocaleString()}`;
   }
 
   init();
