@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Runner Readiness Assessment - Gait Coach App</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111a2e;
+      --muted:#a9b4cc;
+      --text:#eef3ff;
+      --line:rgba(255,255,255,.10);
+      --accent:#3dd6d0;
+      --accent2:#7aa6ff;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --good:#4ee59b;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 15% 10%, rgba(61,214,208,.18), transparent 55%),
+                  radial-gradient(900px 600px at 85% 20%, rgba(122,166,255,.18), transparent 55%),
+                  linear-gradient(180deg, #070b14 0%, var(--bg) 55%, #070b14 100%);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(7,11,20,.92), rgba(7,11,20,.65));
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:18px 16px;}
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(61,214,208,.95), rgba(122,166,255,.85));
+      box-shadow: var(--shadow);
+    }
+    h1{font-size:18px;margin:0;letter-spacing:.2px}
+    .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    button:hover{transform: translateY(-1px); background: rgba(255,255,255,.10)}
+    button.primary{
+      border-color: rgba(61,214,208,.35);
+      background: rgba(61,214,208,.16);
+    }
+    button.danger{
+      border-color: rgba(255,107,107,.35);
+      background: rgba(255,107,107,.14);
+    }
+    main{max-width:1100px;margin:0 auto;padding:18px 16px 80px;}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      header{position:relative}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .card .hd h2{margin:0;font-size:14.5px;letter-spacing:.2px}
+    .pill{
+      font-size:12px;color:var(--muted);
+      padding:6px 10px;border:1px solid var(--line);border-radius:999px;
+      background: rgba(255,255,255,.04);
+    }
+    .card .bd{padding:14px}
+    .row{display:grid;grid-template-columns: 1fr 160px 1.2fr;gap:10px;align-items:center;margin-bottom:10px}
+    .row .lbl{font-size:13px}
+    .row small{display:block;color:var(--muted);margin-top:2px}
+    select, input[type="text"], input[type="date"], textarea{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(10,16,30,.65);
+      color: var(--text);
+      padding:10px 10px;
+      outline:none;
+    }
+    textarea{min-height:110px;resize:vertical}
+    .sectionTitle{
+      margin:16px 0 10px;
+      font-size:12px;
+      color: var(--muted);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 680px){
+      .row{grid-template-columns:1fr}
+      .twoCol{grid-template-columns:1fr}
+    }
+    .kpi{
+      display:grid; grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 680px){
+      .kpi{grid-template-columns:1fr}
+    }
+    .stat{
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: rgba(255,255,255,.04);
+    }
+    .stat b{display:block;font-size:18px;margin-bottom:2px}
+    .stat span{color:var(--muted);font-size:12px}
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      margin: 6px 6px 0 0;
+      font-size:12.5px;
+    }
+    .dot{width:9px;height:9px;border-radius:50%}
+    .dot.good{background: var(--good)}
+    .dot.warn{background: var(--warn)}
+    .dot.bad{background: var(--bad)}
+    .summaryBox{
+      padding:12px;
+      border:1px dashed rgba(255,255,255,.20);
+      border-radius:16px;
+      background: rgba(255,255,255,.03);
+      white-space: pre-wrap;
+      line-height:1.35;
+      font-size:13px;
+    }
+    .footnote{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:8px;
+    }
+    .inline{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .hr{
+      height:1px; background: var(--line);
+      margin:12px 0;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Runner Readiness Assessment</h1>
+          <div class="sub">Dropdown-based intake for gait coaches (Movement • Strength/Stability • Foot • 3D gait summary)</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="btnSave">Save</button>
+        <button id="btnLoad">Load</button>
+        <button id="btnExport">Export JSON</button>
+        <button id="btnPrint">Print</button>
+        <button class="danger" id="btnReset">Reset</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <!-- LEFT: FORM -->
+    <section class="card">
+      <div class="hd">
+        <h2>Assessment Form</h2>
+        <span class="pill" id="autosavePill">Autosave: Off</span>
+      </div>
+      <div class="bd">
+
+        <div class="sectionTitle">Client details</div>
+        <div class="twoCol">
+          <div>
+            <label class="lbl">Client Name</label>
+            <input type="text" id="clientName" placeholder="e.g., Alex Tan" />
+          </div>
+          <div>
+            <label class="lbl">Assessment Date</label>
+            <input type="date" id="assessDate" />
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Movement</div>
+        <div id="movementRows"></div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Strength & Stability</div>
+        <div id="strengthRows"></div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Foot Assessment</div>
+        <div id="footRows"></div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Foot / Ankle ROM (R, L, Goal)</div>
+        <div id="romRows"></div>
+        <div class="footnote">Tip: Use any measure you prefer (e.g., degrees, cm, “knee-to-wall”), just stay consistent per client.</div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">3D Gait Analysis Summary</div>
+        <div class="twoCol">
+          <div>
+            <label class="lbl">Primary Pattern</label>
+            <select id="gaitPattern">
+              <option value="">— Select —</option>
+              <option>Overstrider</option>
+              <option>Bouncer</option>
+              <option>Weaver</option>
+              <option>Collapser</option>
+              <option>Glute Amnesiac</option>
+              <option>Other</option>
+            </select>
+            <small class="sub">From the checklist section in the source form.</small>
+          </div>
+          <div>
+            <label class="lbl">If “Other”, specify</label>
+            <input type="text" id="gaitOther" placeholder="e.g., Crossover / Excessive toe-out / etc." />
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Coach notes</div>
+        <textarea id="notes" placeholder="Write key observations, cues, priorities, and next-step plan..."></textarea>
+
+        <div class="footnote">
+          Variables and categories are based on the Runner Readiness Assessment sheet (Movement, Strength & Stability, Foot Assessment, and 3D Gait Summary). :contentReference[oaicite:1]{index=1}
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT: SUMMARY -->
+    <aside class="card">
+      <div class="hd">
+        <h2>Summary & Flags</h2>
+        <span class="pill" id="lastSaved">Not saved yet</span>
+      </div>
+      <div class="bd">
+        <div class="kpi">
+          <div class="stat">
+            <b id="kpiAble">0</b>
+            <span>Able</span>
+          </div>
+          <div class="stat">
+            <b id="kpiUnable">0</b>
+            <span>Unable</span>
+          </div>
+          <div class="stat">
+            <b id="kpiFlags">0</b>
+            <span>Limitations flagged</span>
+          </div>
+        </div>
+
+        <div class="sectionTitle">Quick flags</div>
+        <div id="flagTags"></div>
+
+        <div class="sectionTitle">Auto-generated summary</div>
+        <div class="summaryBox" id="summaryBox">Fill in the dropdowns️s and your summary will appear here.</div>
+
+        <div class="sectionTitle">Data management</div>
+        <div class="inline">
+          <label class="tag" title="Toggle automatic saving to this browser">
+            <input type="checkbox" id="autosave" />
+            Autosave to device
+          </label>
+          <label class="tag" title="Optional: give this assessment a simple ID">
+            <span style="color:var(--muted)">Case ID</span>
+            <input type="text" id="caseId" placeholder="e.g., AT-2026-01-06" style="width:180px;padding:8px 10px;border-radius:10px" />
+          </label>
+        </div>
+        <div class="footnote">
+          Save/Load uses your browser localStorage (works great on GitHub Pages).
+          Export gives you a JSON file you can store in a client folder.
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<script>
+  // -----------------------------
+  // 1) Variables from the form (page 1)
+  // -----------------------------
+  const FORM = {
+    movement: [
+      {
+        key: "toeTouch",
+        label: "Toe Touch",
+        help: "Able / Unable, plus common limitations",
+        limitations: ["Hamstring Tightness", "Back Tightness", "Core/Back Control", "General Limitation"]
+      },
+      {
+        key: "backBend",
+        label: "Back Bend",
+        help: "Able / Unable, plus common limitations",
+        limitations: ["Hip Ext Tightness", "Back Tightness", "Core/Back Control", "General Limitation"]
+      },
+      {
+        key: "rotation",
+        label: "Rotation",
+        help: "Able / Unable, plus common limitations",
+        limitations: ["Hip Tightness", "Thoracic Tightness", "Hip Rotation Control", "Thoracic Rotation Control", "General Limitation"]
+      },
+      {
+        key: "singleLegBalance",
+        label: "Single Leg Balance",
+        help: "Able / Unable, plus common limitations",
+        limitations: ["Foot/Ankle Control", "Hip Control"]
+      },
+      {
+        key: "squat",
+        label: "Squat",
+        help: "Able / Unable, plus common limitations",
+        limitations: ["Ankle Tightness", "Hip Tightness", "Form/General Limitation"]
+      }
+    ],
+    strength: [
+      { key: "bridge", label: "Bridge", limitations: [] },
+      { key: "sidePlank", label: "Side Plank", limitations: [] },
+      { key: "slSitToStand", label: "SL Sit-to-Stand", limitations: [] },
+      { key: "calfRaise", label: "Calf Raise", limitations: [] }
+    ],
+    foot: [
+      { key: "toeSplay", label: "Toe Splay", limitations: [] },
+      { key: "greatToeExtension", label: "Great Toe Extension", limitations: [] },
+      { key: "greatToeAbd", label: "Great Toe Abd", limitations: [] },
+      { key: "ankleROM", label: "Ankle ROM", limitations: [] }
+    ],
+    romRows: [
+      { key: "rom1", label: "ROM 1" },
+      { key: "rom2", label: "ROM 2" },
+      { key: "rom3", label: "ROM 3" }
+    ]
+  };
+
+  // -----------------------------
+  // 2) UI builders
+  // -----------------------------
+  function makeStatusSelect(id){
+    const sel = document.createElement("select");
+    sel.id = id;
+    sel.innerHTML = `
+      <option value="">— Select —</option>
+      <option value="Able">Able</option>
+      <option value="Unable">Unable</option>
+    `;
+    return sel;
+  }
+
+  function makeLimitSelect(id, limitations){
+    const sel = document.createElement("select");
+    sel.id = id;
+    const opts = [`<option value="">No limitation selected</option>`]
+      .concat(limitations.map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`))
+      .join("");
+    sel.innerHTML = opts;
+    return sel;
+  }
+
+  function addAssessmentRows(containerId, items){
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+    items.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const left = document.createElement("div");
+      left.className = "lbl";
+      left.innerHTML = `${escapeHtml(item.label)}${item.help ? `<small>${escapeHtml(item.help)}</small>` : ""}`;
+
+      const status = makeStatusSelect(`${item.key}__status`);
+
+      const right = document.createElement("div");
+      if(item.limitations && item.limitations.length){
+        const limit = makeLimitSelect(`${item.key}__limit`, item.limitations);
+        right.appendChild(limit);
+      }else{
+        // keep layout consistent
+        const placeholder = document.createElement("div");
+        placeholder.innerHTML = `<small class="sub">—</small>`;
+        right.appendChild(placeholder);
+      }
+
+      row.appendChild(left);
+      row.appendChild(status);
+      row.appendChild(right);
+      container.appendChild(row);
+    });
+  }
+
+  function addRomRows(){
+    const container = document.getElementById("romRows");
+    container.innerHTML = "";
+    FORM.romRows.forEach(r => {
+      const wrap = document.createElement("div");
+      wrap.className = "row";
+
+      const left = document.createElement("div");
+      left.className = "lbl";
+      left.innerHTML = `${escapeHtml(r.label)}<small>Enter values for Right (R), Left (L), and Goal</small>`;
+
+      const mid = document.createElement("div");
+      mid.innerHTML = `
+        <input type="text" id="${r.key}__r" placeholder="R" />
+      `;
+
+      const right = document.createElement("div");
+      right.innerHTML = `
+        <div class="twoCol" style="grid-template-columns: 1fr 1fr; gap:10px;">
+          <input type="text" id="${r.key}__l" placeholder="L" />
+          <input type="text" id="${r.key}__goal" placeholder="Goal" />
+        </div>
+      `;
+
+      wrap.appendChild(left);
+      wrap.appendChild(mid);
+      wrap.appendChild(right);
+      container.appendChild(wrap);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  // -----------------------------
+  // 3) Data model
+  // -----------------------------
+  function collectData(){
+    const data = {
+      meta: {
+        clientName: val("clientName"),
+        assessDate: val("assessDate"),
+        caseId: val("caseId"),
+        savedAtISO: new Date().toISOString()
+      },
+      movement: collectSection(FORM.movement),
+      strength: collectSection(FORM.strength),
+      foot: collectSection(FORM.foot),
+      rom: FORM.romRows.map(r => ({
+        label: r.label,
+        r: val(`${r.key}__r`),
+        l: val(`${r.key}__l`),
+        goal: val(`${r.key}__goal`)
+      })),
+      gaitSummary: {
+        pattern: val("gaitPattern"),
+        other: val("gaitOther")
+      },
+      notes: val("notes")
+    };
+    return data;
+  }
+
+  function collectSection(items){
+    return items.map(item => {
+      const obj = {
+        key: item.key,
+        label: item.label,
+        status: val(`${item.key}__status`) || "",
+        limitation: item.limitations && item.limitations.length ? (val(`${item.key}__limit`) || "") : ""
+      };
+      return obj;
+    });
+  }
+
+  function applyData(data){
+    if(!data) return;
+
+    setVal("clientName", data?.meta?.clientName || "");
+    setVal("assessDate", data?.meta?.assessDate || "");
+    setVal("caseId", data?.meta?.caseId || "");
+
+    applySection(data.movement, FORM.movement);
+    applySection(data.strength, FORM.strength);
+    applySection(data.foot, FORM.foot);
+
+    (data.rom || []).forEach((r, i) => {
+      const key = FORM.romRows[i]?.key;
+      if(!key) return;
+      setVal(`${key}__r`, r.r || "");
+      setVal(`${key}__l`, r.l || "");
+      setVal(`${key}__goal`, r.goal || "");
+    });
+
+    setVal("gaitPattern", data?.gaitSummary?.pattern || "");
+    setVal("gaitOther", data?.gaitSummary?.other || "");
+    setVal("notes", data?.notes || "");
+
+    updateSummary();
+    updateSavedPill(data?.meta?.savedAtISO || null);
+  }
+
+  function applySection(sectionData, items){
+    (sectionData || []).forEach((x) => {
+      if(!x?.key) return;
+      setVal(`${x.key}__status`, x.status || "");
+      const item = items.find(it => it.key === x.key);
+      if(item && item.limitations && item.limitations.length){
+        setVal(`${x.key}__limit`, x.limitation || "");
+      }
+    });
+  }
+
+  function val(id){ return (document.getElementById(id)?.value ?? "").trim(); }
+  function setVal(id, v){
+    const el = document.getElementById(id);
+    if(el) el.value = v;
+  }
+
+  // -----------------------------
+  // 4) Summary & flags
+  // -----------------------------
+  function updateSummary(){
+    const data = collectData();
+
+    const all = [...data.movement, ...data.strength, ...data.foot];
+    const able = all.filter(x => x.status === "Able").length;
+    const unable = all.filter(x => x.status === "Unable").length;
+    const flags = all.filter(x => x.limitation).length;
+
+    document.getElementById("kpiAble").textContent = able;
+    document.getElementById("kpiUnable").te
