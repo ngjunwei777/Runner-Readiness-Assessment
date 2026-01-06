@@ -44,19 +44,17 @@
     .wrap{max-width:1180px;margin:0 auto;padding:18px 16px;}
     .topbar{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
     .brand{display:flex; gap:12px; align-items:center;}
-     .logo{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  background: #ffffff;                 /* white tile behind the black cat */
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: var(--shadow);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.logo svg{display:block}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:#ffffff;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
     }
+    .logo svg{display:block}
     h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
     .actions{display:flex;gap:10px;flex-wrap:wrap}
@@ -163,6 +161,7 @@
       border-radius:16px;
       overflow:hidden;
       background: rgba(255,255,255,.03);
+      min-width: 820px; /* allows horizontal scroll on phones */
     }
     .tbl th, .tbl td{
       padding:10px 10px;
@@ -360,6 +359,23 @@
       line-height:1.35;
     }
 
+    /* Mobile horizontal table scrolling */
+    .tableWrap{
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 16px;
+    }
+    .scrollHint{
+      display:none;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 6px 2px 8px;
+    }
+    @media (max-width: 680px){
+      .scrollHint{ display:block; }
+    }
+
     footer{
       border-top:1px solid var(--line);
       background: rgba(7,11,20,.6);
@@ -379,17 +395,16 @@
     <div class="topbar">
       <div class="brand">
         <div class="logo" aria-hidden="true">
-  <!-- Black cat silhouette (inline SVG) -->
-  <svg viewBox="0 0 128 128" width="44" height="44" aria-hidden="true" focusable="false">
-    <path fill="#000" d="M23 56c0-10 3-19 10-26l-3-17c-1-5 4-9 9-7l16 8c3-1 6-2 9-2h6c3 0 6 1 9 2l16-8c5-2 10 2 9 7l-3 17c7 7 10 16 10 26 0 26-20 44-47 44H70c-27 0-47-18-47-44z"/>
-    <!-- ears cut-ins / simple face suggestion -->
-    <path fill="#000" d="M38 30l-2-12 10 5c-3 2-6 4-8 7zM90 30c-2-3-5-5-8-7l10-5-2 12z"/>
-    <!-- tail -->
-    <path fill="#000" d="M104 90c10 0 18 7 18 16 0 8-6 14-15 14-6 0-9-3-12-7 7 1 12-2 12-7 0-5-5-9-11-9-4 0-7 1-10 3l-6-10c6-4 13-6 24-6z"/>
-  </svg>
-</div>
+          <!-- Black cat silhouette (inline SVG) -->
+          <svg viewBox="0 0 128 128" width="44" height="44" aria-hidden="true" focusable="false">
+            <path fill="#000" d="M23 56c0-10 3-19 10-26l-3-17c-1-5 4-9 9-7l16 8c3-1 6-2 9-2h6c3 0 6 1 9 2l16-8c5-2 10 2 9 7l-3 17c7 7 10 16 10 26 0 26-20 44-47 44H70c-27 0-47-18-47-44z"/>
+            <path fill="#000" d="M38 30l-2-12 10 5c-3 2-6 4-8 7zM90 30c-2-3-5-5-8-7l10-5-2 12z"/>
+            <path fill="#000" d="M104 90c10 0 18 7 18 16 0 8-6 14-15 14-6 0-9-3-12-7 7 1 12-2 12-7 0-5-5-9-11-9-4 0-7 1-10 3l-6-10c6-4 13-6 24-6z"/>
+          </svg>
+        </div>
+        <div>
           <h1>Runner Readiness Assessment</h1>
-          <div class="sub">Assessment + Training History Waiver (collapsible) • Export PDF + XLSX</div>
+          <div class="sub">Assessment + Training History Waiver • Export PDF + XLSX</div>
         </div>
       </div>
       <div class="actions">
@@ -535,22 +550,33 @@
         <div class="hr"></div>
 
         <div class="sectionTitle">Movement (Able / Unable + Limitations if Unable)</div>
-        <div id="movementTable"></div>
+        <div class="scrollHint">Tip: swipe left/right to view all columns →</div>
+        <div class="tableWrap"><div id="movementTable"></div></div>
 
         <div class="hr"></div>
 
         <div class="sectionTitle">Strength & Stability (Able/Unable per side)</div>
-        <div id="strengthTable"></div>
+        <div class="scrollHint">Tip: swipe left/right to view all columns →</div>
+        <div class="tableWrap"><div id="strengthTable"></div></div>
 
         <div class="hr"></div>
 
         <div class="sectionTitle">Foot Assessment (Able/Unable per side)</div>
-        <div id="footTable"></div>
+        <div class="scrollHint">Tip: swipe left/right to view all columns →</div>
+        <div class="tableWrap"><div id="footTable"></div></div>
 
         <div class="hr"></div>
 
         <div class="sectionTitle">Ankle ROM (Inability) — L / R</div>
         <div id="ankleRomBlock"></div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Gait analysis findings</div>
+        <div class="footnote">Tap to select. Add extra notes if needed.</div>
+        <div id="gaitFindingsChips" class="chips" style="margin-top:8px;"></div>
+        <div style="height:10px"></div>
+        <textarea id="gaitFindingsNotes" placeholder="Details: when it occurs, severity, cues tried, treadmill speed, cadence notes, video timestamp, etc."></textarea>
 
         <div class="hr"></div>
 
@@ -652,10 +678,25 @@
     { key: "pronation", label: "Pronation inability", glyph: "⤵︎" }
   ];
 
-  const STORAGE_KEY = "runner_readiness_assessment_v7";
+  const GAIT_FINDINGS = [
+    "Overstrider",
+    "Bouncer",
+    "Weaver",
+    "Crossover",
+    "Collapser",
+    "Heavy lander",
+    "Low cadence",
+    "Excess vertical oscillation",
+    "Hip drop / Trendelenburg",
+    "Lateral pelvic tilt",
+    "Excess trunk lean",
+    "Excess arm swing / rotation"
+  ];
+
+  const STORAGE_KEY = "runner_readiness_assessment_v8";
 
   // =========================================================
-  // RECOMMENDATION LIBRARY (lightweight + practical)
+  // RECOMMENDATION LIBRARY
   // =========================================================
   const RECS = {
     movement: {
@@ -681,49 +722,37 @@
       }
     },
     strength: {
-      bridge: {
-        stability: ["Glute bridge iso hold 3×20–30s", "Marching bridge 2×6/side"],
-        mobility: ["Hip flexor stretch 2×30s/side"]
-      },
-      side_plank: {
-        stability: ["Side plank (knees) 3×15–25s/side", "Side-lying hip abduction 2×10/side"],
-        mobility: ["QL/lat gentle stretch 2×20s/side"]
-      },
-      sl_sit_to_stand: {
-        stability: ["Single-leg sit-to-stand to higher box 2×5/side", "Step-down (slow) 2×6/side", "Split squat (supported) 2×6/side"],
-        mobility: ["Ankle DF drill 2×10/side"]
-      },
-      calf_raise: {
-        stability: ["Single-leg calf raise (support) 3×6–10/side", "Eccentric heel drop 2×8/side"],
-        mobility: ["Calf stretch (gastroc/soleus) 2×30s/side"]
-      }
+      bridge: { stability: ["Glute bridge iso hold 3×20–30s", "Marching bridge 2×6/side"], mobility: ["Hip flexor stretch 2×30s/side"] },
+      side_plank: { stability: ["Side plank (knees) 3×15–25s/side", "Side-lying hip abduction 2×10/side"], mobility: ["QL/lat gentle stretch 2×20s/side"] },
+      sl_sit_to_stand: { stability: ["Single-leg sit-to-stand to higher box 2×5/side", "Step-down (slow) 2×6/side", "Split squat (supported) 2×6/side"], mobility: ["Ankle DF drill 2×10/side"] },
+      calf_raise: { stability: ["Single-leg calf raise (support) 3×6–10/side", "Eccentric heel drop 2×8/side"], mobility: ["Calf stretch (gastroc/soleus) 2×30s/side"] }
     },
     foot: {
-      toe_splay: {
-        mobility: ["Toe splay practice 2×8", "Toe spacers (if tolerated) 5–10 min"],
-        stability: ["Short-foot exercise 2×8–10", "Single-leg balance with tripod foot 2×20s/side"]
-      },
-      great_toe_extension: {
-        mobility: ["Great toe extension stretch 2×30s/side", "Plantar fascia roll 1–2 min/foot"],
-        stability: ["Towel scrunches 2×10", "Calf raises focusing on big toe pressure 2×8–10"]
-      },
-      great_toe_abduction: {
-        mobility: ["Toe yoga (big toe up/down) 2×8", "Manual big-toe abduction stretch 2×20s"],
-        stability: ["Short-foot + big toe press 2×8", "Band-resisted toe abduction 2×8–10"]
-      }
+      toe_splay: { mobility: ["Toe splay practice 2×8", "Toe spacers (if tolerated) 5–10 min"], stability: ["Short-foot exercise 2×8–10", "Single-leg balance with tripod foot 2×20s/side"] },
+      great_toe_extension: { mobility: ["Great toe extension stretch 2×30s/side", "Plantar fascia roll 1–2 min/foot"], stability: ["Towel scrunches 2×10", "Calf raises focusing on big toe pressure 2×8–10"] },
+      great_toe_abduction: { mobility: ["Toe yoga (big toe up/down) 2×8", "Manual big-toe abduction stretch 2×20s"], stability: ["Short-foot + big toe press 2×8", "Band-resisted toe abduction 2×8–10"] }
     },
     ankleRom: {
       eversion: { mobility:["Banded ankle eversion 2×10/side", "Peroneal soft tissue release 1–2 min"], stability:["Single-leg balance (tripod) 2×20s/side"] },
       inversion: { mobility:["Banded ankle inversion 2×10/side", "Posterior tib activation (band) 2×10"], stability:["Arch control holds 2×20s/side"] },
       supination:{ mobility:["Foot mobility circles 2×6 each direction", "Midfoot mobilization (gentle) 1–2 min"], stability:["Short-foot exercise 2×8–10"] },
       pronation:{ mobility:["Calf/soleus stretch 2×30s/side", "Ankle DF knee-to-wall 2×10"], stability:["Tibialis posterior raises 2×10", "Single-leg balance 2×20s/side"] }
+    },
+    gait: {
+      Overstrider: { mobility:["Hip flexor stretch 2×30s/side","Ankle DF drill 2×10/side"], stability:["Cadence build (metronome) +5–8%","Single-leg RDL reach 2×6/side"] },
+      Bouncer: { mobility:["Calf/soleus stretch 2×30s/side"], stability:["Marching drills (A-march) 2×20m","Core anti-extension (dead bug) 2×6/side"] },
+      Weaver: { mobility:["Adductor rock-backs 2×8/side","Hip IR/ER stretch 2×30s/side"], stability:["Mini-band lateral steps 2×10/side","Single-leg balance 2×20s/side"] },
+      Crossover: { mobility:["TFL/hip stretch 2×20s/side"], stability:["Glute med work (side-lying abduction) 2×10/side","Step-down control 2×6/side"] },
+      Collapser: { mobility:["Hip ER stretch 2×30s/side"], stability:["Split squat (supported) 2×6/side","Short-foot 2×8–10"] },
+      "Heavy lander": { mobility:["Ankle DF drill 2×10/side"], stability:["Soft landing drills (low pogo) 2×10","Tempo squat 2×5"] },
+      "Low cadence": { mobility:["Hip mobility flow 2×45s"], stability:["Metronome cadence +5–8%","Wall march drill 2×20s"] }
     }
   };
 
   // =========================================================
   // STATE
   // =========================================================
-  const STATE = { toggles: {}, movementLimits: {} };
+  const STATE = { toggles: {}, movementLimits: {}, gaitFindings: [] };
 
   // =========================================================
   // DOM helpers
@@ -997,10 +1026,10 @@
       });
 
       const leftCell = el("div", { class:"ankleCell" });
-      leftCell.appendChild(makeToggleButton(idL, "Toggle", { variant:"bad" }));
+      leftCell.appendChild(makeToggleButton(idL, "Limited", { variant:"bad" }));
 
       const rightCell = el("div", { class:"ankleCell" });
-      rightCell.appendChild(makeToggleButton(idR, "Toggle", { variant:"bad" }));
+      rightCell.appendChild(makeToggleButton(idR, "Limited", { variant:"bad" }));
 
       grid.appendChild(labelCell);
       grid.appendChild(leftCell);
@@ -1009,6 +1038,45 @@
 
     document.getElementById("ankleRomBlock").innerHTML = "";
     document.getElementById("ankleRomBlock").appendChild(grid);
+  }
+
+  // =========================================================
+  // Gait Findings chips
+  // =========================================================
+  function buildGaitFindings(){
+    const wrap = document.getElementById("gaitFindingsChips");
+    if(!wrap) return;
+    wrap.innerHTML = "";
+
+    GAIT_FINDINGS.forEach(label => {
+      const chip = el("span", { class:"chip", "data-gait": label }, [
+        el("span", { class:"dot" }),
+        document.createTextNode(label)
+      ]);
+
+      chip.addEventListener("click", () => {
+        const s = new Set(STATE.gaitFindings || []);
+        if(s.has(label)) s.delete(label);
+        else s.add(label);
+        STATE.gaitFindings = Array.from(s);
+        refreshGaitChips();
+        onAnyChange();
+      });
+
+      wrap.appendChild(chip);
+    });
+
+    refreshGaitChips();
+  }
+
+  function refreshGaitChips(){
+    const wrap = document.getElementById("gaitFindingsChips");
+    if(!wrap) return;
+    const selected = new Set(STATE.gaitFindings || []);
+    [...wrap.querySelectorAll(".chip")].forEach(chip => {
+      const lab = chip.getAttribute("data-gait");
+      chip.classList.toggle("on", selected.has(lab));
+    });
   }
 
   // =========================================================
@@ -1065,16 +1133,13 @@
   }
 
   function collectRecommendations(){
-    // returns { mobility:[], stability:[], notes:[] }
     const mobility = [];
     const stability = [];
     const notes = [];
 
-    // Movement: if unable -> use both; if limitation suggests "control" -> emphasize stability, else mobility+stability
     MOVEMENT.forEach(m => {
       const unable = getToggle(`mv__${m.key}__unable`);
       if(!unable) return;
-
       const lib = RECS.movement[m.key];
       if(lib?.mobility) mobility.push(...lib.mobility);
       if(lib?.stability) stability.push(...lib.stability);
@@ -1082,14 +1147,12 @@
       const limits = STATE.movementLimits[m.key] || [];
       if(limits.length){
         notes.push(`${m.label} limitations: ${limits.join(", ")}`);
-        // small heuristic: if any limitation has "control" or "form" -> prioritize stability
         if(limits.some(x => /control|form/i.test(x))){
           stability.push("Add 1–2 anti-rotation / core control drills (Pallof, dead bug) 2–3×/week");
         }
       }
     });
 
-    // Strength: if unable L/R -> stability exercises
     STRENGTH.forEach(it => {
       const uL = getToggle(`st__${it.key}__unable__L`);
       const uR = getToggle(`st__${it.key}__unable__R`);
@@ -1100,7 +1163,6 @@
       notes.push(`${it.label} unable: ${(uL&&uR)?"L+R":(uL?"L":"R")}`);
     });
 
-    // Foot: if unable -> mix
     FOOT.forEach(it => {
       const uL = getToggle(`ft__${it.key}__unable__L`);
       const uR = getToggle(`ft__${it.key}__unable__R`);
@@ -1111,7 +1173,6 @@
       notes.push(`${it.label} unable: ${(uL&&uR)?"L+R":(uL?"L":"R")}`);
     });
 
-    // Ankle ROM: inability -> mobility + stability from mapping
     ANKLE_ROM.forEach(r => {
       const L = getToggle(`ank__${r.key}__L`);
       const R = getToggle(`ank__${r.key}__R`);
@@ -1120,6 +1181,14 @@
       if(lib?.mobility) mobility.push(...lib.mobility);
       if(lib?.stability) stability.push(...lib.stability);
       notes.push(`${r.label}: ${(L&&R)?"L+R":(L?"L":"R")}`);
+    });
+
+    (STATE.gaitFindings || []).forEach(g => {
+      const lib = RECS.gait?.[g];
+      if(!lib) return;
+      if(lib.mobility) mobility.push(...lib.mobility);
+      if(lib.stability) stability.push(...lib.stability);
+      notes.push(`Gait finding: ${g}`);
     });
 
     return {
@@ -1132,7 +1201,7 @@
   function formatRecsText(recs){
     const lines = [];
     if(!recs.mobility.length && !recs.stability.length){
-      return "No recommendations yet.\nTip: mark any area as Unable to generate targeted mobility/stability suggestions.";
+      return "No recommendations yet.\nTip: mark any area as Unable/Limited or tag gait findings to generate suggestions.";
     }
     lines.push("Mobility focus");
     lines.push(...(recs.mobility.length ? recs.mobility.map(x => `- ${x}`) : ["- (none)"]));
@@ -1163,6 +1232,8 @@
       },
       waiver: collectWaiver(),
       notes: getVal("notes"),
+      gaitFindings: STATE.gaitFindings || [],
+      gaitFindingsNotes: getVal("gaitFindingsNotes"),
       toggles: STATE.toggles,
       movementLimits: STATE.movementLimits
     };
@@ -1175,10 +1246,12 @@
     setVal("assessDate", data?.meta?.assessDate || "");
     setVal("caseId", data?.meta?.caseId || "");
     setVal("notes", data?.notes || "");
+    setVal("gaitFindingsNotes", data?.gaitFindingsNotes || "");
     applyWaiver(data?.waiver || {});
 
     STATE.toggles = {};
     STATE.movementLimits = {};
+    STATE.gaitFindings = Array.isArray(data?.gaitFindings) ? data.gaitFindings : [];
 
     // restore toggles
     const t = data?.toggles || {};
@@ -1196,6 +1269,7 @@
       setLimitCellEnabled(m.key, !!STATE.toggles[`mv__${m.key}__unable`]);
     });
 
+    refreshGaitChips();
     updateSavedPill(data?.meta?.savedAtISO || null);
     onAnyChange();
   }
@@ -1225,13 +1299,12 @@
   function resetAll(){
     if(!confirm("Reset the form? This will clear everything on-screen.")) return;
 
-    // meta + notes
     setVal("clientName","");
     setVal("caseId","");
     setVal("notes","");
+    setVal("gaitFindingsNotes","");
     document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
 
-    // waiver fields
     [
       "yearsRunning","runsPerWeek","mileagePerWeek","runningGoals","mskHistory",
       "stressFracture","medicalClearance","waiverAccurate","waiverProceed",
@@ -1239,19 +1312,20 @@
     ].forEach(id => setVal(id,""));
     document.getElementById("waiverDetails").open = false;
 
-    // toggles UI
     for(const id of Object.keys(STATE.toggles)){
       STATE.toggles[id] = false;
       const btn = document.querySelector(`[data-tid="${cssEsc(id)}"]`);
       if(btn) btn.classList.remove("on");
     }
 
-    // movement limits
     MOVEMENT.forEach(m => {
       STATE.movementLimits[m.key] = [];
       refreshLimitChips(m.key);
       setLimitCellEnabled(m.key, false);
     });
+
+    STATE.gaitFindings = [];
+    refreshGaitChips();
 
     updateSavedPill(null);
     onAnyChange();
@@ -1336,9 +1410,17 @@
     lines.push(`${name} • ${date}`);
     lines.push("");
 
-    // Waiver summary first
     const wLines = waiverSummaryLines();
     if(wLines.length) lines.push(...wLines);
+
+    const gf = (STATE.gaitFindings || []);
+    const gfNotes = getVal("gaitFindingsNotes");
+    if(gf.length || gfNotes){
+      lines.push("Gait Analysis Findings");
+      if(gf.length) lines.push(`- Tags: ${gf.join(", ")}`);
+      if(gfNotes) lines.push(`- Notes: ${gfNotes}`);
+      lines.push("");
+    }
 
     lines.push("Movement");
     MOVEMENT.forEach(m => {
@@ -1395,12 +1477,10 @@
 
     lines.push("");
     lines.push(COPYRIGHT);
-
     return lines.join("\n");
   }
 
   function onAnyChange(){
-    // KPIs
     let unableCount = 0;
     MOVEMENT.forEach(m => { if(getToggle(`mv__${m.key}__unable`)) unableCount++; });
 
@@ -1423,7 +1503,6 @@
     document.getElementById("kpiLimit").textContent = limitCount;
     document.getElementById("kpiLR").textContent = lrCount;
 
-    // Flags (include waiver risk flags)
     const tags = [];
     const sf = getVal("stressFracture");
     const mc = getVal("medicalClearance");
@@ -1431,6 +1510,9 @@
     if(sf && sf.includes("current")) tags.push({ text:`Waiver: Current stress fracture indicated`, level:"bad" });
     if(mc && mc.includes("Required")) tags.push({ text:`Waiver: Medical clearance required (pending)`, level:"warn" });
     if(proc === "No") tags.push({ text:`Waiver: Client did NOT agree to proceed`, level:"bad" });
+
+    const gf = (STATE.gaitFindings || []);
+    if(gf.length) tags.push({ text:`Gait tags: ${gf.join(", ")}`, level:"warn" });
 
     MOVEMENT.forEach(m => {
       const unable = getToggle(`mv__${m.key}__unable`);
@@ -1459,14 +1541,11 @@
 
     renderTags(tags);
 
-    // Summary box
     document.getElementById("summaryBox").textContent = buildSummaryText();
 
-    // Recommendations box
     const recs = collectRecommendations();
     document.getElementById("recBox").textContent = formatRecsText(recs);
 
-    // Autosave
     if(document.getElementById("autosave").checked){
       save();
     }
@@ -1485,7 +1564,7 @@
   }
 
   // =========================================================
-  // PDF export (includes recommendations + copyright)
+  // PDF export
   // =========================================================
   function pdfExport(){
     const data = collectAll();
@@ -1527,6 +1606,23 @@
       startY: 126,
       head: [["Training History & Waiver", "Details"]],
       body: waiverRows,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 4, valign:"top" },
+      headStyles: { fillColor: [30, 40, 70] },
+      theme: "grid",
+      margin: { left: 40, right: 40 },
+      columnStyles: { 0: { cellWidth: 170 }, 1: { cellWidth: 345 } }
+    });
+
+    // Gait Findings
+    const gf = (STATE.gaitFindings || []).join(", ");
+    const gfNotes = getVal("gaitFindingsNotes");
+    doc.autoTable({
+      startY: doc.lastAutoTable.finalY + 14,
+      head: [["Gait Analysis Findings", "Details"]],
+      body: [
+        ["Tags", gf || ""],
+        ["Notes", gfNotes || ""]
+      ],
       styles: { font: "helvetica", fontSize: 9, cellPadding: 4, valign:"top" },
       headStyles: { fillColor: [30, 40, 70] },
       theme: "grid",
@@ -1594,7 +1690,7 @@
     });
 
     // Ankle ROM
-    const ankHead = ["Ankle ROM (Inability)","Left","Right"];
+    const ankHead = ["Ankle ROM (Limited)","Left","Right"];
     const ankBody = ANKLE_ROM.map(r => ([
       r.label,
       getToggle(`ank__${r.key}__L`) ? "✓" : "",
@@ -1626,7 +1722,7 @@
     const summary = buildSummaryText();
     doc.text(doc.splitTextToSize(summary, 515), 40, 84);
 
-    // Add footer on all pages
+    // Footer on all pages
     const total = doc.getNumberOfPages();
     for(let p=1; p<=total; p++){
       doc.setPage(p);
@@ -1638,7 +1734,7 @@
   }
 
   // =========================================================
-  // XLSX export (includes recommendations sheet + copyright)
+  // XLSX export
   // =========================================================
   function xlsxExport(){
     const data = collectAll();
@@ -1657,7 +1753,7 @@
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metaRows), "Meta");
 
-    // Waiver / History
+    // Waiver
     const w = data.waiver || {};
     const waiverAoa = [
       ["Training History & Waiver", ""],
@@ -1674,6 +1770,16 @@
       ["Signature date", w.signatureDate || ""]
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(waiverAoa), "Waiver");
+
+    // Gait Findings sheet
+    const gfAoa = [
+      ["Gait Analysis Findings", ""],
+      ["Tags", (STATE.gaitFindings || []).join(", ")],
+      ["Notes", getVal("gaitFindingsNotes") || ""],
+      [],
+      ["Copyright", COPYRIGHT]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(gfAoa), "Gait Findings");
 
     // Movement
     const mvAoa = [["Metric","Able","Unable","Limitations (if unable)"]];
@@ -1714,7 +1820,7 @@
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ftAoa), "Foot");
 
     // Ankle ROM
-    const ankAoa = [["Motion (Inability)","Left","Right"]];
+    const ankAoa = [["Motion (Limited)","Left","Right"]];
     ANKLE_ROM.forEach(r => {
       ankAoa.push([
         r.label,
@@ -1724,7 +1830,7 @@
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ankAoa), "Ankle ROM");
 
-    // Recommendations (NEW)
+    // Recommendations
     const recAoa = [
       ["Recommended Mobility / Stability Exercises", ""],
       [],
@@ -1795,16 +1901,12 @@
     buildLRTable("strengthTable", "st", STRENGTH);
     buildLRTable("footTable", "ft", FOOT);
     buildAnkleBlock();
+    buildGaitFindings();
 
     wire();
     onAnyChange();
-  }
 
-  // Save/Load need these functions after wire() but before init() calls them:
-  function updateSavedPill(iso){
-    const pill = document.getElementById("lastSaved");
-    if(!iso){ pill.textContent = "Not saved yet"; return; }
-    pill.textContent = `Saved: ${new Date(iso).toLocaleString()}`;
+    // try auto-load if autosave was on previously (optional)
   }
 
   init();
