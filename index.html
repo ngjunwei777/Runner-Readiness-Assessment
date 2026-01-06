@@ -41,7 +41,7 @@
       background: linear-gradient(180deg, rgba(7,11,20,.92), rgba(7,11,20,.65));
       border-bottom:1px solid var(--line);
     }
-    .wrap{max-width:1150px;margin:0 auto;padding:18px 16px;}
+    .wrap{max-width:1180px;margin:0 auto;padding:18px 16px;}
     .topbar{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
     .brand{display:flex; gap:12px; align-items:center;}
     .logo{
@@ -65,8 +65,8 @@
     button.primary{border-color: rgba(61,214,208,.35); background: rgba(61,214,208,.16);}
     button.danger{border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.14);}
 
-    main{max-width:1150px;margin:0 auto;padding:18px 16px 80px;}
-    .grid{display:grid;grid-template-columns: 1.25fr .75fr;gap:14px;}
+    main{max-width:1180px;margin:0 auto;padding:18px 16px 80px;}
+    .grid{display:grid;grid-template-columns: 1.3fr .7fr;gap:14px;}
     @media (max-width: 980px){ .grid{grid-template-columns:1fr} header{position:relative} }
 
     .card{
@@ -141,42 +141,57 @@
       letter-spacing:.08em;
     }
     .metricCell{
-      font-weight:700;
-      width: 220px;
+      font-weight:800;
+      width: 230px;
       min-width: 180px;
       background: rgba(255,255,255,.02);
       user-select:none;
+      cursor:pointer;
     }
 
-    /* Clickable toggle cells */
-    .cellToggle{
+    /* Clickable "Able / Unable" buttons inside table cells */
+    .toggleBtn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      width:100%;
+      min-height:42px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;
+      background: rgba(255,255,255,.04);
       cursor:pointer;
       user-select:none;
-      transition: background .12s ease, transform .06s ease;
+      transition: transform .06s ease, background .12s ease, border-color .12s ease;
+      font-weight:700;
     }
-    .cellToggle:hover{background: rgba(255,255,255,.05)}
-    .cellToggle:active{transform: scale(.99)}
-    .cellToggle.disabled{
-      opacity:.45;
-      cursor:not-allowed;
+    .toggleBtn:hover{background: rgba(255,255,255,.06)}
+    .toggleBtn:active{transform: scale(.99)}
+    .toggleBtn.on{
+      border-color: rgba(61,214,208,.55);
+      background: rgba(61,214,208,.14);
     }
-    .cellCenter{
-      display:flex; align-items:center; justify-content:center; min-height:28px;
+    .toggleBtn.bad.on{
+      border-color: rgba(255,107,107,.55);
+      background: rgba(255,107,107,.14);
     }
-
-    /* Faux checkbox UI inside cells */
-    .box{
-      width:18px;height:18px;border-radius:5px;
+    .tick{
+      width:18px;height:18px;border-radius:6px;
       border:1px solid rgba(255,255,255,.25);
       background: rgba(10,16,30,.55);
       position:relative;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+      flex: 0 0 auto;
     }
-    .box.on{
+    .toggleBtn.on .tick{
       border-color: rgba(61,214,208,.6);
       background: rgba(61,214,208,.18);
     }
-    .box.on::after{
+    .toggleBtn.bad.on .tick{
+      border-color: rgba(255,107,107,.6);
+      background: rgba(255,107,107,.16);
+    }
+    .toggleBtn.on .tick::after{
       content:"";
       position:absolute;
       left:5px; top:2px;
@@ -185,8 +200,17 @@
       border-bottom:2px solid var(--accent);
       transform: rotate(40deg);
     }
+    .toggleBtn.bad.on .tick::after{
+      border-right-color: rgba(255,107,107,.95);
+      border-bottom-color: rgba(255,107,107,.95);
+    }
+    .toggleBtn.disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      pointer-events:none;
+    }
 
-    /* Limitation chips (multi-select) */
+    /* Multi-select limitation chips */
     .chips{display:flex; flex-wrap:wrap; gap:6px;}
     .chip{
       display:inline-flex; align-items:center; gap:6px;
@@ -207,21 +231,33 @@
       border-color: rgba(255,204,102,.45);
       background: rgba(255,204,102,.14);
     }
-    .chip.on .dot{background: var(--warn)}
     .dot{width:8px;height:8px;border-radius:50%;background: rgba(255,255,255,.25)}
+    .chip.on .dot{background: var(--warn)}
+    .limitsHint{
+      color: var(--muted);
+      font-size:12px;
+      padding:6px 0 2px;
+    }
 
-    /* Ankle ROM "pleasing looking" buttons */
+    /* Ankle ROM block (prettier) */
     .ankleGrid{
       display:grid;
-      grid-template-columns: 1fr 110px 110px;
+      grid-template-columns: 1fr 120px 120px;
       border:1px solid var(--line);
       border-radius:16px;
       overflow:hidden;
       background: rgba(255,255,255,.03);
     }
-    .ankleRow{
-      display:contents;
+    .ankleCell{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      border-right:1px solid var(--line);
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
+    .ankleCell:last-child{border-right:none}
     .ankleHead{
       background: rgba(255,255,255,.05);
       color: var(--muted);
@@ -230,18 +266,10 @@
       text-transform:uppercase;
       letter-spacing:.08em;
     }
-    .ankleCell{
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      border-right:1px solid var(--line);
-      font-size:13px;
-    }
-    .ankleCell:last-child{border-right:none}
-    .ankleRow:last-child .ankleCell{border-bottom:none}
     .ankleLabel{
-      display:flex; align-items:center; gap:10px;
-      font-weight:700;
+      font-weight:800;
       background: rgba(255,255,255,.02);
+      cursor:pointer;
       user-select:none;
     }
     .glyph{
@@ -252,12 +280,8 @@
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
       font-size:16px;
     }
-    .ankleToggle{
-      display:flex; align-items:center; justify-content:center; gap:10px;
-    }
-    .sideLbl{font-size:12px;color:var(--muted);margin-left:6px}
 
-    /* Summary side */
+    /* Summary */
     .kpi{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;}
     @media (max-width: 680px){ .kpi{grid-template-columns:1fr} }
     .stat{
@@ -268,7 +292,6 @@
     }
     .stat b{display:block;font-size:18px;margin-bottom:2px}
     .stat span{color:var(--muted);font-size:12px}
-
     .tag{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 10px;
@@ -302,7 +325,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>Runner Readiness Assessment</h1>
-          <div class="sub">Movement: tap to toggle Able/Unable • If Unable → multi-select limitations • Export PDF + XLSX</div>
+          <div class="sub">Tap Able/Unable. If Unable → tap limitation chips. Export PDF + XLSX. (JSON removed)</div>
         </div>
       </div>
       <div class="actions">
@@ -319,7 +342,6 @@
 
 <main>
   <div class="grid">
-
     <!-- LEFT -->
     <section class="card">
       <div class="hd">
@@ -342,18 +364,18 @@
 
         <div class="hr"></div>
 
-        <div class="sectionTitle">Movement (Able / Unable + Limitations if unable)</div>
+        <div class="sectionTitle">Movement (Able / Unable + Limitations if Unable)</div>
         <div id="movementTable"></div>
-        <div class="footnote">Tip: “Able” and “Unable” are mutually exclusive. Limitations only activate when “Unable” is selected.</div>
+        <div class="footnote">Able/Unable are mutually exclusive. Limitations only activate when Unable is selected.</div>
 
         <div class="hr"></div>
 
-        <div class="sectionTitle">Strength & Stability (L / R)</div>
+        <div class="sectionTitle">Strength & Stability (Able/Unable per side)</div>
         <div id="strengthTable"></div>
 
         <div class="hr"></div>
 
-        <div class="sectionTitle">Foot Assessment (L / R)</div>
+        <div class="sectionTitle">Foot Assessment (Able/Unable per side)</div>
         <div id="footTable"></div>
 
         <div class="hr"></div>
@@ -365,7 +387,6 @@
 
         <div class="sectionTitle">Coach notes</div>
         <textarea id="notes" placeholder="Key observations, cues, priorities, plan..."></textarea>
-
       </div>
     </section>
 
@@ -387,7 +408,7 @@
           </div>
           <div class="stat">
             <b id="kpiLR">0</b>
-            <span>L/R checks</span>
+            <span>L/R selections</span>
           </div>
         </div>
 
@@ -412,7 +433,6 @@
         <div class="footnote">Save/Load uses browser localStorage (works on GitHub Pages).</div>
       </div>
     </aside>
-
   </div>
 </main>
 
@@ -421,31 +441,11 @@
   // CONFIG
   // =========================================================
   const MOVEMENT = [
-    {
-      key: "toe_touch",
-      label: "Toe Touch",
-      limits: ["Hamstring Tightness","Back Tightness","Core/Back Control","General Limitation"]
-    },
-    {
-      key: "back_bend",
-      label: "Back Bend",
-      limits: ["Hip Ext Tightness","Back Tightness","Core/Back Control","General Limitation"]
-    },
-    {
-      key: "rotation",
-      label: "Rotation",
-      limits: ["Hip Tightness","Thoracic Tightness","Hip Rotation Control","Thoracic Rotation Control","General Limitation"]
-    },
-    {
-      key: "single_leg_balance",
-      label: "Single Leg Balance",
-      limits: ["Foot/Ankle Control","Hip Control"]
-    },
-    {
-      key: "squat",
-      label: "Squat",
-      limits: ["Ankle Tightness","Hip Tightness","Form/General Limitation"]
-    }
+    { key: "toe_touch", label: "Toe Touch", limits: ["Hamstring Tightness","Back Tightness","Core/Back Control","General Limitation"] },
+    { key: "back_bend", label: "Back Bend", limits: ["Hip Ext Tightness","Back Tightness","Core/Back Control","General Limitation"] },
+    { key: "rotation", label: "Rotation", limits: ["Hip Tightness","Thoracic Tightness","Hip Rotation Control","Thoracic Rotation Control","General Limitation"] },
+    { key: "single_leg_balance", label: "Single Leg Balance", limits: ["Foot/Ankle Control","Hip Control"] },
+    { key: "squat", label: "Squat", limits: ["Ankle Tightness","Hip Tightness","Form/General Limitation"] }
   ];
 
   const STRENGTH = [
@@ -468,7 +468,15 @@
     { key: "pronation", label: "Pronation inability", glyph: "⤵︎" }
   ];
 
-  const STORAGE_KEY = "runner_readiness_assessment_v4";
+  const STORAGE_KEY = "runner_readiness_assessment_v5";
+
+  // =========================================================
+  // STATE
+  // =========================================================
+  const STATE = {
+    toggles: {},            // id -> bool
+    movementLimits: {}      // movementKey -> [strings]
+  };
 
   // =========================================================
   // DOM helpers
@@ -492,137 +500,163 @@
   function setVal(id, v){ const x=document.getElementById(id); if(x) x.value=v; }
 
   // =========================================================
-  // Clickable cell toggles (no native checkbox needed)
+  // Toggle primitives (for Able/Unable and L/R cells)
   // =========================================================
-  function makeToggleCell(id, {disabled=false, onChange=null} = {}){
-    const box = el("div", { class: "box", "data-id": id });
-    const cell = el("td", { class: `cellToggle${disabled ? " disabled" : ""}`, "data-tid": id, tabindex: "0", role:"button" }, [
-      el("div", { class:"cellCenter" }, [box])
+  function getToggle(id){ return !!STATE.toggles[id]; }
+  function setToggle(id, v){
+    STATE.toggles[id] = !!v;
+    const btn = document.querySelector(`[data-tid="${cssEsc(id)}"]`);
+    if(btn) btn.classList.toggle("on", !!v);
+  }
+  function cssEsc(str){ return String(str).replace(/"/g, '\\"'); }
+
+  function makeToggleButton(id, label, {variant="good", onToggle=null} = {}){
+    const btn = el("div", {
+      class: `toggleBtn ${variant === "bad" ? "bad" : ""}`,
+      "data-tid": id,
+      role:"button",
+      tabindex:"0",
+      "aria-pressed": "false"
+    }, [
+      el("div", { class:"tick" }),
+      el("div", { html: esc(label) })
     ]);
 
-    setToggleUI(id, false);
-
     function toggle(){
-      if(cell.classList.contains("disabled")) return;
-      const next = !getToggleState(id);
-      setToggleState(id, next);
-      setToggleUI(id, next);
-      if(typeof onChange === "function") onChange(next);
+      const next = !getToggle(id);
+      setToggle(id, next);
+      btn.setAttribute("aria-pressed", next ? "true" : "false");
+      if(typeof onToggle === "function") onToggle(next);
       onAnyChange();
     }
 
-    cell.addEventListener("click", toggle);
-    cell.addEventListener("keydown", (e) => {
+    btn.addEventListener("click", toggle);
+    btn.addEventListener("keydown", (e) => {
       if(e.key === "Enter" || e.key === " "){
         e.preventDefault();
         toggle();
       }
     });
 
-    return cell;
-  }
+    // init UI
+    setToggle(id, false);
 
-  function setToggleUI(id, on){
-    const box = document.querySelector(`.box[data-id="${cssEsc(id)}"]`);
-    if(box) box.classList.toggle("on", !!on);
-  }
-
-  // simple state store (in-memory + saved/exported)
-  const STATE = { toggles: {}, movementLimits: {} };
-
-  function getToggleState(id){ return !!STATE.toggles[id]; }
-  function setToggleState(id, v){ STATE.toggles[id] = !!v; }
-
-  function cssEsc(str){
-    // safe for querySelector attr
-    return String(str).replace(/"/g, '\\"');
+    return btn;
   }
 
   // =========================================================
-  // Movement table: Able/Unable toggle + multi limitation chips when Unable
+  // Movement table (THIS ensures: Able/Unable clickable + limitations clickable when unable)
   // =========================================================
   function buildMovementTable(){
     const table = el("table", { class:"tbl" });
+
     const thead = el("thead");
     const trh = el("tr");
-    trh.appendChild(el("th", { class:"metricCell", html:"Metric" }));
+    trh.appendChild(el("th", { class:"metricCell", html:"Metric (tap to clear row)" }));
     trh.appendChild(el("th", { html:"Able" }));
     trh.appendChild(el("th", { html:"Unable" }));
-    trh.appendChild(el("th", { html:"If Unable: Limitations (multi-select)" }));
+    trh.appendChild(el("th", { html:"If Unable: Click limitations (multi-select)" }));
     thead.appendChild(trh);
     table.appendChild(thead);
 
     const tbody = el("tbody");
 
     MOVEMENT.forEach(m => {
+      const ableId = `mv__${m.key}__able`;
+      const unableId = `mv__${m.key}__unable`;
+
+      if(!STATE.movementLimits[m.key]) STATE.movementLimits[m.key] = [];
+
       const tr = el("tr");
 
       const metricTd = el("td", { class:"metricCell", html: esc(m.label) });
       metricTd.addEventListener("click", () => {
-        const any = getToggleState(`mv__${m.key}__able`) || getToggleState(`mv__${m.key}__unable`) ||
-                    ((STATE.movementLimits[m.key] || []).length > 0);
+        const any = getToggle(ableId) || getToggle(unableId) || (STATE.movementLimits[m.key] || []).length;
         if(!any) return;
         if(!confirm(`Clear "${m.label}" (Able/Unable + limitations)?`)) return;
-        setToggleState(`mv__${m.key}__able`, false);
-        setToggleState(`mv__${m.key}__unable`, false);
-        setToggleUI(`mv__${m.key}__able`, false);
-        setToggleUI(`mv__${m.key}__unable`, false);
+
+        setToggle(ableId, false);
+        setToggle(unableId, false);
         STATE.movementLimits[m.key] = [];
         refreshLimitChips(m.key);
+
         setLimitCellEnabled(m.key, false);
         onAnyChange();
       });
       tr.appendChild(metricTd);
 
-      // Able cell (mutually exclusive with Unable)
-      const ableId = `mv__${m.key}__able`;
-      const unableId = `mv__${m.key}__unable`;
-
-      const ableCell = makeToggleCell(ableId, {
-        onChange: (on) => {
+      // Able button (mutually exclusive with unable)
+      const ableTd = el("td");
+      const ableBtn = makeToggleButton(ableId, "Able", {
+        variant: "good",
+        onToggle: (on) => {
           if(on){
-            // turn off unable
-            setToggleState(unableId, false);
-            setToggleUI(unableId, false);
-            // disable limitations + clear them
+            // turn off unable and clear limits
+            setToggle(unableId, false);
             STATE.movementLimits[m.key] = [];
             refreshLimitChips(m.key);
             setLimitCellEnabled(m.key, false);
           }
         }
       });
+      ableTd.appendChild(ableBtn);
+      tr.appendChild(ableTd);
 
-      const unableCell = makeToggleCell(unableId, {
-        onChange: (on) => {
+      // Unable button (mutually exclusive with able)
+      const unableTd = el("td");
+      const unableBtn = makeToggleButton(unableId, "Unable", {
+        variant: "bad",
+        onToggle: (on) => {
           if(on){
-            // turn off able
-            setToggleState(ableId, false);
-            setToggleUI(ableId, false);
-            // enable limitations
-            setLimitCellEnabled(m.key, true);
+            setToggle(ableId, false);
+            setLimitCellEnabled(m.key, true);     // <-- enables clickable limitations
           }else{
-            // disable limitations + clear them
             STATE.movementLimits[m.key] = [];
             refreshLimitChips(m.key);
-            setLimitCellEnabled(m.key, false);
+            setLimitCellEnabled(m.key, false);    // <-- disables clickable limitations
           }
         }
       });
+      unableTd.appendChild(unableBtn);
+      tr.appendChild(unableTd);
 
-      tr.appendChild(ableCell);
-      tr.appendChild(unableCell);
-
-      // Limitations cell (chips)
+      // Limitations cell
       const limitTd = el("td", { id: `mv__${m.key}__limitsCell` });
-      limitTd.appendChild(el("div", { class:"chips", id: `mv__${m.key}__chips` }));
+
+      const hint = el("div", { class:"limitsHint", id:`mv__${m.key}__hint`, html:"Select <b>Unable</b> to enable limitations." });
+      const chipWrap = el("div", { class:"chips", id: `mv__${m.key}__chips` });
+
+      // Render chips (always present, but disabled until Unable)
+      m.limits.forEach(lab => {
+        const chip = el("span", { class:"chip", "data-mkey": m.key, "data-lab": lab }, [
+          el("span", { class:"dot" }),
+          document.createTextNode(lab)
+        ]);
+        chip.addEventListener("click", () => {
+          // only clickable if unable
+          if(!getToggle(unableId)) return;
+
+          const selected = new Set(STATE.movementLimits[m.key] || []);
+          if(selected.has(lab)) selected.delete(lab);
+          else selected.add(lab);
+
+          STATE.movementLimits[m.key] = Array.from(selected);
+          refreshLimitChips(m.key);
+          onAnyChange();
+        });
+        chipWrap.appendChild(chip);
+      });
+
+      limitTd.appendChild(hint);
+      limitTd.appendChild(chipWrap);
+
       tr.appendChild(limitTd);
 
       tbody.appendChild(tr);
 
-      // init limitations store
-      if(!STATE.movementLimits[m.key]) STATE.movementLimits[m.key] = [];
-      renderLimitChips(m);
+      // initial state: disabled limitations
       setLimitCellEnabled(m.key, false);
+      refreshLimitChips(m.key);
     });
 
     table.appendChild(tbody);
@@ -630,31 +664,6 @@
     const container = document.getElementById("movementTable");
     container.innerHTML = "";
     container.appendChild(table);
-  }
-
-  function renderLimitChips(m){
-    const chipWrap = document.getElementById(`mv__${m.key}__chips`);
-    chipWrap.innerHTML = "";
-    m.limits.forEach(lab => {
-      const chip = el("span", { class:"chip", "data-mkey": m.key, "data-lab": lab }, [
-        el("span", { class:"dot" }),
-        document.createTextNode(lab)
-      ]);
-      chip.addEventListener("click", () => {
-        const enabled = getToggleState(`mv__${m.key}__unable`);
-        if(!enabled) return;
-
-        const selected = new Set(STATE.movementLimits[m.key] || []);
-        if(selected.has(lab)) selected.delete(lab);
-        else selected.add(lab);
-
-        STATE.movementLimits[m.key] = Array.from(selected);
-        refreshLimitChips(m.key);
-        onAnyChange();
-      });
-      chipWrap.appendChild(chip);
-    });
-    refreshLimitChips(m.key);
   }
 
   function refreshLimitChips(metricKey){
@@ -669,19 +678,24 @@
 
   function setLimitCellEnabled(metricKey, enabled){
     const cell = document.getElementById(`mv__${metricKey}__limitsCell`);
-    if(!cell) return;
-    cell.style.opacity = enabled ? "1" : ".45";
-    cell.style.pointerEvents = enabled ? "auto" : "none";
+    const hint = document.getElementById(`mv__${metricKey}__hint`);
+    const chips = document.getElementById(`mv__${metricKey}__chips`);
+    if(!cell || !chips || !hint) return;
+
+    chips.style.opacity = enabled ? "1" : ".45";
+    chips.style.pointerEvents = enabled ? "auto" : "none";
+    hint.style.display = enabled ? "none" : "block";
   }
 
   // =========================================================
-  // Strength & Foot tables (L/R Able/Unable clickable cells)
+  // Strength / Foot tables (clickable Able/Unable per side)
   // =========================================================
   function buildLRTable(containerId, prefix, items){
     const table = el("table", { class:"tbl" });
+
     const thead = el("thead");
     const trh = el("tr");
-    trh.appendChild(el("th", { class:"metricCell", html:"Metric (tap name to clear row)" }));
+    trh.appendChild(el("th", { class:"metricCell", html:"Metric (tap to clear row)" }));
     trh.appendChild(el("th", { html:"Able (L)" }));
     trh.appendChild(el("th", { html:"Able (R)" }));
     trh.appendChild(el("th", { html:"Unable (L)" }));
@@ -694,78 +708,85 @@
     items.forEach(it => {
       const tr = el("tr");
 
-      const metricTd = el("td", { class:"metricCell", html: esc(it.label) });
-      metricTd.addEventListener("click", () => {
-        const ids = [
-          `${prefix}__${it.key}__able__L`,
-          `${prefix}__${it.key}__able__R`,
-          `${prefix}__${it.key}__unable__L`,
-          `${prefix}__${it.key}__unable__R`
-        ];
-        const any = ids.some(id => getToggleState(id));
-        if(!any) return;
-        if(!confirm(`Clear "${it.label}" (L/R Able/Unable)?`)) return;
-        ids.forEach(id => { setToggleState(id,false); setToggleUI(id,false); });
-        onAnyChange();
-      });
-      tr.appendChild(metricTd);
-
-      // For each side, keep Able/Unable mutually exclusive
       const aL = `${prefix}__${it.key}__able__L`;
       const aR = `${prefix}__${it.key}__able__R`;
       const uL = `${prefix}__${it.key}__unable__L`;
       const uR = `${prefix}__${it.key}__unable__R`;
 
-      tr.appendChild(makeToggleCell(aL, { onChange:(on)=>{ if(on){ setToggleState(uL,false); setToggleUI(uL,false);} } }));
-      tr.appendChild(makeToggleCell(aR, { onChange:(on)=>{ if(on){ setToggleState(uR,false); setToggleUI(uR,false);} } }));
-      tr.appendChild(makeToggleCell(uL, { onChange:(on)=>{ if(on){ setToggleState(aL,false); setToggleUI(aL,false);} } }));
-      tr.appendChild(makeToggleCell(uR, { onChange:(on)=>{ if(on){ setToggleState(aR,false); setToggleUI(aR,false);} } }));
+      const metricTd = el("td", { class:"metricCell", html: esc(it.label) });
+      metricTd.addEventListener("click", () => {
+        const ids = [aL,aR,uL,uR];
+        const any = ids.some(id => getToggle(id));
+        if(!any) return;
+        if(!confirm(`Clear "${it.label}" (L/R Able/Unable)?`)) return;
+        ids.forEach(id => setToggle(id,false));
+        onAnyChange();
+      });
+      tr.appendChild(metricTd);
+
+      const td1 = el("td");
+      td1.appendChild(makeToggleButton(aL, "Able", { variant:"good", onToggle:(on)=>{ if(on) setToggle(uL,false); } }));
+      tr.appendChild(td1);
+
+      const td2 = el("td");
+      td2.appendChild(makeToggleButton(aR, "Able", { variant:"good", onToggle:(on)=>{ if(on) setToggle(uR,false); } }));
+      tr.appendChild(td2);
+
+      const td3 = el("td");
+      td3.appendChild(makeToggleButton(uL, "Unable", { variant:"bad", onToggle:(on)=>{ if(on) setToggle(aL,false); } }));
+      tr.appendChild(td3);
+
+      const td4 = el("td");
+      td4.appendChild(makeToggleButton(uR, "Unable", { variant:"bad", onToggle:(on)=>{ if(on) setToggle(aR,false); } }));
+      tr.appendChild(td4);
 
       tbody.appendChild(tr);
     });
 
     table.appendChild(tbody);
+
     const container = document.getElementById(containerId);
     container.innerHTML = "";
     container.appendChild(table);
   }
 
   // =========================================================
-  // Ankle ROM (prettier block with glyphs)
+  // Ankle ROM block (prettier)
   // =========================================================
   function buildAnkleBlock(){
     const grid = el("div", { class:"ankleGrid" });
 
-    // header row
     grid.appendChild(el("div", { class:"ankleCell ankleHead", html:"Ankle motion (inability)" }));
     grid.appendChild(el("div", { class:"ankleCell ankleHead", html:"Left" }));
     grid.appendChild(el("div", { class:"ankleCell ankleHead", html:"Right" }));
 
     ANKLE_ROM.forEach(r => {
-      const label = el("div", { class:"ankleCell ankleLabel" }, [
+      const idL = `ank__${r.key}__L`;
+      const idR = `ank__${r.key}__R`;
+
+      const labelCell = el("div", { class:"ankleCell ankleLabel" }, [
         el("div", { class:"glyph", html: esc(r.glyph) }),
         el("div", { html: esc(r.label) })
       ]);
 
-      // clicking label clears row
-      label.addEventListener("click", () => {
-        const idL = `ank__${r.key}__L`;
-        const idR = `ank__${r.key}__R`;
-        const any = getToggleState(idL) || getToggleState(idR);
+      // click label to clear row
+      labelCell.addEventListener("click", () => {
+        const any = getToggle(idL) || getToggle(idR);
         if(!any) return;
         if(!confirm(`Clear "${r.label}" (L/R)?`)) return;
-        [idL,idR].forEach(id => { setToggleState(id,false); setToggleUI(id,false); });
+        setToggle(idL,false);
+        setToggle(idR,false);
         onAnyChange();
       });
 
-      const leftCell = el("div", { class:"ankleCell ankleToggle" });
-      const rightCell = el("div", { class:"ankleCell ankleToggle" });
+      // Left / Right buttons
+      const leftCell = el("div", { class:"ankleCell" });
+      leftCell.appendChild(makeToggleButton(idL, "Toggle", { variant:"bad" }));
 
-      // use td-like toggle cells but inside div grid
-      leftCell.appendChild(makeInlineToggle(`ank__${r.key}__L`));
-      rightCell.appendChild(makeInlineToggle(`ank__${r.key}__R`));
+      const rightCell = el("div", { class:"ankleCell" });
+      rightCell.appendChild(makeToggleButton(idR, "Toggle", { variant:"bad" }));
 
-      grid.appendChild(label);
+      grid.appendChild(labelCell);
       grid.appendChild(leftCell);
       grid.appendChild(rightCell);
     });
@@ -775,35 +796,8 @@
     container.appendChild(grid);
   }
 
-  function makeInlineToggle(id){
-    const wrap = el("div", { class:"cellToggle", style:"border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px;min-width:70px;display:flex;justify-content:center;" });
-    const box = el("div", { class:"box", "data-id": id });
-    wrap.appendChild(box);
-
-    setToggleUI(id, false);
-
-    function toggle(){
-      if(wrap.classList.contains("disabled")) return;
-      const next = !getToggleState(id);
-      setToggleState(id, next);
-      setToggleUI(id, next);
-      onAnyChange();
-    }
-
-    wrap.addEventListener("click", toggle);
-    wrap.tabIndex = 0;
-    wrap.addEventListener("keydown", (e) => {
-      if(e.key === "Enter" || e.key === " "){
-        e.preventDefault();
-        toggle();
-      }
-    });
-
-    return wrap;
-  }
-
   // =========================================================
-  // Collect / Apply (for save/load/export)
+  // Collect / Apply for save/load/export
   // =========================================================
   function collectAll(){
     return {
@@ -827,15 +821,16 @@
     setVal("caseId", data?.meta?.caseId || "");
     setVal("notes", data?.notes || "");
 
-    // reset state
+    // reset
     STATE.toggles = {};
     STATE.movementLimits = {};
 
     // restore toggles
     const t = data?.toggles || {};
     for(const [id,v] of Object.entries(t)){
-      setToggleState(id, !!v);
-      setToggleUI(id, !!v);
+      STATE.toggles[id] = !!v;
+      const btn = document.querySelector(`[data-tid="${cssEsc(id)}"]`);
+      if(btn) btn.classList.toggle("on", !!v);
     }
 
     // restore movement limitations
@@ -843,8 +838,9 @@
     MOVEMENT.forEach(m => {
       STATE.movementLimits[m.key] = Array.isArray(ml[m.key]) ? ml[m.key] : [];
       refreshLimitChips(m.key);
-      // enable limitations cell depending on unable
-      setLimitCellEnabled(m.key, getToggleState(`mv__${m.key}__unable`));
+
+      const unableId = `mv__${m.key}__unable`;
+      setLimitCellEnabled(m.key, !!STATE.toggles[unableId]);
     });
 
     updateSavedPill(data?.meta?.savedAtISO || null);
@@ -852,7 +848,7 @@
   }
 
   // =========================================================
-  // Save / Load
+  // Save / Load / Reset
   // =========================================================
   function updateSavedPill(iso){
     const pill = document.getElementById("lastSaved");
@@ -881,21 +877,18 @@
     setVal("notes","");
     document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
 
-    // clear all toggles
+    // clear toggles UI
     for(const id of Object.keys(STATE.toggles)){
-      setToggleState(id,false);
-      setToggleUI(id,false);
+      STATE.toggles[id] = false;
+      const btn = document.querySelector(`[data-tid="${cssEsc(id)}"]`);
+      if(btn) btn.classList.remove("on");
     }
-    STATE.toggles = {};
 
-    // clear limitations
+    // clear movement limits
     MOVEMENT.forEach(m => {
       STATE.movementLimits[m.key] = [];
       refreshLimitChips(m.key);
       setLimitCellEnabled(m.key, false);
-      // also clear able/unable visuals for movement (in case they were not in STATE keys)
-      setToggleUI(`mv__${m.key}__able`, false);
-      setToggleUI(`mv__${m.key}__unable`, false);
     });
 
     updateSavedPill(null);
@@ -903,7 +896,7 @@
   }
 
   // =========================================================
-  // Summary & Flags
+  // Summary
   // =========================================================
   function sideText(L,R){
     if(L && R) return "L+R";
@@ -939,8 +932,8 @@
 
     lines.push("Movement");
     MOVEMENT.forEach(m => {
-      const able = getToggleState(`mv__${m.key}__able`);
-      const unable = getToggleState(`mv__${m.key}__unable`);
+      const able = getToggle(`mv__${m.key}__able`);
+      const unable = getToggle(`mv__${m.key}__unable`);
       const limits = STATE.movementLimits[m.key] || [];
       if(able || unable || limits.length){
         const status = able ? "Able" : (unable ? "Unable" : "—");
@@ -952,10 +945,10 @@
     lines.push("");
     lines.push("Strength & Stability (L/R)");
     STRENGTH.forEach(it => {
-      const aL = getToggleState(`st__${it.key}__able__L`);
-      const aR = getToggleState(`st__${it.key}__able__R`);
-      const uL = getToggleState(`st__${it.key}__unable__L`);
-      const uR = getToggleState(`st__${it.key}__unable__R`);
+      const aL = getToggle(`st__${it.key}__able__L`);
+      const aR = getToggle(`st__${it.key}__able__R`);
+      const uL = getToggle(`st__${it.key}__unable__L`);
+      const uR = getToggle(`st__${it.key}__unable__R`);
       if(aL||aR||uL||uR){
         lines.push(`- ${it.label}: Able(${sideText(aL,aR)}) | Unable(${sideText(uL,uR)})`);
       }
@@ -964,10 +957,10 @@
     lines.push("");
     lines.push("Foot Assessment (L/R)");
     FOOT.forEach(it => {
-      const aL = getToggleState(`ft__${it.key}__able__L`);
-      const aR = getToggleState(`ft__${it.key}__able__R`);
-      const uL = getToggleState(`ft__${it.key}__unable__L`);
-      const uR = getToggleState(`ft__${it.key}__unable__R`);
+      const aL = getToggle(`ft__${it.key}__able__L`);
+      const aR = getToggle(`ft__${it.key}__able__R`);
+      const uL = getToggle(`ft__${it.key}__unable__L`);
+      const uR = getToggle(`ft__${it.key}__unable__R`);
       if(aL||aR||uL||uR){
         lines.push(`- ${it.label}: Able(${sideText(aL,aR)}) | Unable(${sideText(uL,uR)})`);
       }
@@ -976,8 +969,8 @@
     lines.push("");
     lines.push("Ankle ROM (Inability) (L/R)");
     ANKLE_ROM.forEach(r => {
-      const L = getToggleState(`ank__${r.key}__L`);
-      const R = getToggleState(`ank__${r.key}__R`);
+      const L = getToggle(`ank__${r.key}__L`);
+      const R = getToggle(`ank__${r.key}__R`);
       if(L||R){
         lines.push(`- ${r.label}: ${sideText(L,R)}`);
       }
@@ -996,7 +989,7 @@
   function onAnyChange(){
     // KPIs
     let unableCount = 0;
-    MOVEMENT.forEach(m => { if(getToggleState(`mv__${m.key}__unable`)) unableCount++; });
+    MOVEMENT.forEach(m => { if(getToggle(`mv__${m.key}__unable`)) unableCount++; });
 
     let limitCount = 0;
     MOVEMENT.forEach(m => { limitCount += (STATE.movementLimits[m.key] || []).length; });
@@ -1011,7 +1004,7 @@
       ]),
       ...ANKLE_ROM.flatMap(r => [`ank__${r.key}__L`,`ank__${r.key}__R`])
     ];
-    lrKeys.forEach(id => { if(getToggleState(id)) lrCount++; });
+    lrKeys.forEach(id => { if(getToggle(id)) lrCount++; });
 
     document.getElementById("kpiUnable").textContent = unableCount;
     document.getElementById("kpiLimit").textContent = limitCount;
@@ -1019,35 +1012,30 @@
 
     // Flags
     const tags = [];
-
     MOVEMENT.forEach(m => {
-      const unable = getToggleState(`mv__${m.key}__unable`);
+      const unable = getToggle(`mv__${m.key}__unable`);
       const limits = STATE.movementLimits[m.key] || [];
       if(unable) tags.push({ text:`Movement: ${m.label} = Unable`, level:"bad" });
       if(unable && limits.length) tags.push({ text:`${m.label} limitations: ${limits.join(", ")}`, level:"warn" });
     });
-
     STRENGTH.forEach(it => {
-      const uL = getToggleState(`st__${it.key}__unable__L`);
-      const uR = getToggleState(`st__${it.key}__unable__R`);
+      const uL = getToggle(`st__${it.key}__unable__L`);
+      const uR = getToggle(`st__${it.key}__unable__R`);
       if(uL||uR) tags.push({ text:`Strength: ${it.label} unable (${sideText(uL,uR)})`, level:"bad" });
     });
-
     FOOT.forEach(it => {
-      const uL = getToggleState(`ft__${it.key}__unable__L`);
-      const uR = getToggleState(`ft__${it.key}__unable__R`);
+      const uL = getToggle(`ft__${it.key}__unable__L`);
+      const uR = getToggle(`ft__${it.key}__unable__R`);
       if(uL||uR) tags.push({ text:`Foot: ${it.label} unable (${sideText(uL,uR)})`, level:"bad" });
     });
-
     ANKLE_ROM.forEach(r => {
-      const L = getToggleState(`ank__${r.key}__L`);
-      const R = getToggleState(`ank__${r.key}__R`);
+      const L = getToggle(`ank__${r.key}__L`);
+      const R = getToggle(`ank__${r.key}__R`);
       if(L||R) tags.push({ text:`Ankle ROM: ${r.label} (${sideText(L,R)})`, level:"bad" });
     });
-
     renderTags(tags);
 
-    // Summary text
+    // Summary box
     document.getElementById("summaryBox").textContent = buildSummaryText();
 
     // Autosave
@@ -1082,9 +1070,9 @@
     // Movement table
     const mvHead = ["Movement Metric","Able","Unable","Limitations (if unable)"];
     const mvBody = MOVEMENT.map(m => {
-      const able = getToggleState(`mv__${m.key}__able`) ? "✓" : "";
-      const unable = getToggleState(`mv__${m.key}__unable`) ? "✓" : "";
-      const limits = (getToggleState(`mv__${m.key}__unable`) ? (STATE.movementLimits[m.key] || []).join(", ") : "");
+      const able = getToggle(`mv__${m.key}__able`) ? "✓" : "";
+      const unable = getToggle(`mv__${m.key}__unable`) ? "✓" : "";
+      const limits = (getToggle(`mv__${m.key}__unable`) ? (STATE.movementLimits[m.key] || []).join(", ") : "");
       return [m.label, able, unable, limits];
     });
 
@@ -1102,10 +1090,10 @@
     const stHead = ["Strength & Stability","Able (L)","Able (R)","Unable (L)","Unable (R)"];
     const stBody = STRENGTH.map(it => ([
       it.label,
-      getToggleState(`st__${it.key}__able__L`) ? "✓" : "",
-      getToggleState(`st__${it.key}__able__R`) ? "✓" : "",
-      getToggleState(`st__${it.key}__unable__L`) ? "✓" : "",
-      getToggleState(`st__${it.key}__unable__R`) ? "✓" : ""
+      getToggle(`st__${it.key}__able__L`) ? "✓" : "",
+      getToggle(`st__${it.key}__able__R`) ? "✓" : "",
+      getToggle(`st__${it.key}__unable__L`) ? "✓" : "",
+      getToggle(`st__${it.key}__unable__R`) ? "✓" : ""
     ]));
 
     doc.autoTable({
@@ -1122,10 +1110,10 @@
     const ftHead = ["Foot Assessment","Able (L)","Able (R)","Unable (L)","Unable (R)"];
     const ftBody = FOOT.map(it => ([
       it.label,
-      getToggleState(`ft__${it.key}__able__L`) ? "✓" : "",
-      getToggleState(`ft__${it.key}__able__R`) ? "✓" : "",
-      getToggleState(`ft__${it.key}__unable__L`) ? "✓" : "",
-      getToggleState(`ft__${it.key}__unable__R`) ? "✓" : ""
+      getToggle(`ft__${it.key}__able__L`) ? "✓" : "",
+      getToggle(`ft__${it.key}__able__R`) ? "✓" : "",
+      getToggle(`ft__${it.key}__unable__L`) ? "✓" : "",
+      getToggle(`ft__${it.key}__unable__R`) ? "✓" : ""
     ]));
 
     doc.autoTable({
@@ -1142,8 +1130,8 @@
     const ankHead = ["Ankle ROM (Inability)","Left","Right"];
     const ankBody = ANKLE_ROM.map(r => ([
       r.label,
-      getToggleState(`ank__${r.key}__L`) ? "✓" : "",
-      getToggleState(`ank__${r.key}__R`) ? "✓" : ""
+      getToggle(`ank__${r.key}__L`) ? "✓" : "",
+      getToggle(`ank__${r.key}__R`) ? "✓" : ""
     ]));
 
     doc.autoTable({
@@ -1156,7 +1144,7 @@
       margin: { left: 40, right: 40 }
     });
 
-    // Summary + Notes
+    // Summary
     doc.addPage();
     doc.setFont("helvetica", "bold"); doc.setFontSize(13);
     doc.text("Summary", 40, 60);
@@ -1166,8 +1154,8 @@
     const sumLines = doc.splitTextToSize(summary, 515);
     doc.text(sumLines, 40, 80);
 
-    const fileBase = ((caseId !== "—" ? caseId : (client !== "—" ? client : "assessment"))).replace(/[^\w\-]+/g, "_");
-    doc.save(`${fileBase}_runner_readiness_${new Date().toISOString().slice(0,10)}.pdf`);
+    const base = ((caseId !== "—" ? caseId : (client !== "—" ? client : "assessment"))).replace(/[^\w\-]+/g, "_");
+    doc.save(`${base}_runner_readiness_${new Date().toISOString().slice(0,10)}.pdf`);
   }
 
   // =========================================================
@@ -1175,10 +1163,9 @@
   // =========================================================
   function xlsxExport(){
     const data = collectAll();
-
     const wb = XLSX.utils.book_new();
 
-    // Sheet 1: Meta
+    // Meta
     const metaRows = [
       ["Runner Readiness Assessment"],
       ["Client Name", data.meta.clientName || ""],
@@ -1188,54 +1175,56 @@
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metaRows), "Meta");
 
-    // Sheet 2: Movement
+    // Movement
     const mvAoa = [["Metric","Able","Unable","Limitations (if unable)"]];
     MOVEMENT.forEach(m => {
-      const able = getToggleState(`mv__${m.key}__able`) ? "Yes" : "";
-      const unable = getToggleState(`mv__${m.key}__unable`) ? "Yes" : "";
-      const limits = (getToggleState(`mv__${m.key}__unable`) ? (STATE.movementLimits[m.key] || []).join(", ") : "");
-      mvAoa.push([m.label, able, unable, limits]);
+      mvAoa.push([
+        m.label,
+        getToggle(`mv__${m.key}__able`) ? "Yes" : "",
+        getToggle(`mv__${m.key}__unable`) ? "Yes" : "",
+        (getToggle(`mv__${m.key}__unable`) ? (STATE.movementLimits[m.key] || []).join(", ") : "")
+      ]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(mvAoa), "Movement");
 
-    // Sheet 3: Strength
+    // Strength
     const stAoa = [["Metric","Able (L)","Able (R)","Unable (L)","Unable (R)"]];
     STRENGTH.forEach(it => {
       stAoa.push([
         it.label,
-        getToggleState(`st__${it.key}__able__L`) ? "Yes" : "",
-        getToggleState(`st__${it.key}__able__R`) ? "Yes" : "",
-        getToggleState(`st__${it.key}__unable__L`) ? "Yes" : "",
-        getToggleState(`st__${it.key}__unable__R`) ? "Yes" : ""
+        getToggle(`st__${it.key}__able__L`) ? "Yes" : "",
+        getToggle(`st__${it.key}__able__R`) ? "Yes" : "",
+        getToggle(`st__${it.key}__unable__L`) ? "Yes" : "",
+        getToggle(`st__${it.key}__unable__R`) ? "Yes" : ""
       ]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(stAoa), "Strength");
 
-    // Sheet 4: Foot
+    // Foot
     const ftAoa = [["Metric","Able (L)","Able (R)","Unable (L)","Unable (R)"]];
     FOOT.forEach(it => {
       ftAoa.push([
         it.label,
-        getToggleState(`ft__${it.key}__able__L`) ? "Yes" : "",
-        getToggleState(`ft__${it.key}__able__R`) ? "Yes" : "",
-        getToggleState(`ft__${it.key}__unable__L`) ? "Yes" : "",
-        getToggleState(`ft__${it.key}__unable__R`) ? "Yes" : ""
+        getToggle(`ft__${it.key}__able__L`) ? "Yes" : "",
+        getToggle(`ft__${it.key}__able__R`) ? "Yes" : "",
+        getToggle(`ft__${it.key}__unable__L`) ? "Yes" : "",
+        getToggle(`ft__${it.key}__unable__R`) ? "Yes" : ""
       ]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ftAoa), "Foot");
 
-    // Sheet 5: Ankle ROM
+    // Ankle ROM
     const ankAoa = [["Motion (Inability)","Left","Right"]];
     ANKLE_ROM.forEach(r => {
       ankAoa.push([
         r.label,
-        getToggleState(`ank__${r.key}__L`) ? "Yes" : "",
-        getToggleState(`ank__${r.key}__R`) ? "Yes" : ""
+        getToggle(`ank__${r.key}__L`) ? "Yes" : "",
+        getToggle(`ank__${r.key}__R`) ? "Yes" : ""
       ]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ankAoa), "Ankle ROM");
 
-    // Sheet 6: Notes + Summary
+    // Notes + Summary
     const nsAoa = [
       ["Coach Notes"],
       [getVal("notes") || ""],
@@ -1252,7 +1241,7 @@
   }
 
   // =========================================================
-  // Wiring
+  // Wire up
   // =========================================================
   function wire(){
     document.getElementById("btnSave").addEventListener("click", save);
@@ -1273,21 +1262,12 @@
   }
 
   function init(){
-    // default date today
     document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
 
-    // build UI
-    buildMovementTable();
+    buildMovementTable();                 // <-- Able/Unable clickable + limitations clickable when unable
     buildLRTable("strengthTable", "st", STRENGTH);
     buildLRTable("footTable", "ft", FOOT);
     buildAnkleBlock();
-
-    // ensure movement chips exist
-    MOVEMENT.forEach(m => {
-      if(!STATE.movementLimits[m.key]) STATE.movementLimits[m.key] = [];
-      refreshLimitChips(m.key);
-      setLimitCellEnabled(m.key, false);
-    });
 
     wire();
     onAnyChange();
