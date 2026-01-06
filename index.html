@@ -97,9 +97,11 @@
       text-transform:uppercase;
     }
     .twoCol{display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
+    .threeCol{display:grid;grid-template-columns: 1fr 1fr 1fr;gap:10px;}
+    @media (max-width: 800px){ .threeCol{grid-template-columns:1fr} }
     @media (max-width: 680px){ .twoCol{grid-template-columns:1fr} }
 
-    input[type="text"], input[type="date"], textarea{
+    input[type="text"], input[type="date"], input[type="number"], select, textarea{
       width:100%;
       border-radius:12px;
       border:1px solid var(--line);
@@ -112,6 +114,37 @@
     .hr{height:1px;background:var(--line);margin:12px 0;}
     .footnote{color:var(--muted);font-size:12px;margin-top:8px;}
     .inline{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+    /* Collapsible */
+    details{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    details summary{
+      cursor:pointer;
+      user-select:none;
+      list-style:none;
+      padding:12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(255,255,255,.04);
+      font-weight:800;
+    }
+    details summary::-webkit-details-marker{display:none}
+    .chev{
+      width:28px;height:28px;border-radius:10px;
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      transition: transform .15s ease;
+      color: var(--muted);
+    }
+    details[open] .chev{ transform: rotate(180deg); }
+    .detailsBody{ padding:12px; }
 
     /* Tables */
     .tbl{
@@ -149,7 +182,7 @@
       cursor:pointer;
     }
 
-    /* Clickable "Able / Unable" buttons inside table cells */
+    /* Clickable buttons in cells */
     .toggleBtn{
       display:flex;
       align-items:center;
@@ -204,13 +237,8 @@
       border-right-color: rgba(255,107,107,.95);
       border-bottom-color: rgba(255,107,107,.95);
     }
-    .toggleBtn.disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      pointer-events:none;
-    }
 
-    /* Multi-select limitation chips */
+    /* Chips */
     .chips{display:flex; flex-wrap:wrap; gap:6px;}
     .chip{
       display:inline-flex; align-items:center; gap:6px;
@@ -233,13 +261,9 @@
     }
     .dot{width:8px;height:8px;border-radius:50%;background: rgba(255,255,255,.25)}
     .chip.on .dot{background: var(--warn)}
-    .limitsHint{
-      color: var(--muted);
-      font-size:12px;
-      padding:6px 0 2px;
-    }
+    .limitsHint{color: var(--muted);font-size:12px;padding:6px 0 2px;}
 
-    /* Ankle ROM block (prettier) */
+    /* Ankle ROM block */
     .ankleGrid{
       display:grid;
       grid-template-columns: 1fr 120px 120px;
@@ -314,6 +338,19 @@
       line-height:1.35;
       font-size:13px;
     }
+
+    /* Waiver chips */
+    .miniRow{display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
+    @media (max-width: 680px){ .miniRow{grid-template-columns:1fr} }
+    .warnBox{
+      border:1px solid rgba(255,204,102,.35);
+      background: rgba(255,204,102,.08);
+      border-radius:14px;
+      padding:10px;
+      color: var(--text);
+      font-size:12.5px;
+      line-height:1.35;
+    }
   </style>
 </head>
 
@@ -325,7 +362,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>Runner Readiness Assessment</h1>
-          <div class="sub">Tap Able/Unable. If Unable → tap limitation chips. Export PDF + XLSX. (JSON removed)</div>
+          <div class="sub">Assessment + Training History Waiver (collapsible) • Export PDF + XLSX</div>
         </div>
       </div>
       <div class="actions">
@@ -362,11 +399,117 @@
           </div>
         </div>
 
+        <!-- NEW: Collapsible Training History / Waiver -->
+        <div class="sectionTitle">Training History & Waiver</div>
+        <details id="waiverDetails">
+          <summary>
+            <span>Open / Close: Training History, Goals & Medical Waiver</span>
+            <span class="chev">▾</span>
+          </summary>
+          <div class="detailsBody">
+
+            <div class="sectionTitle" style="margin-top:0;">Training history</div>
+            <div class="threeCol">
+              <div>
+                <label class="footnote">Years of running experience</label>
+                <input type="number" id="yearsRunning" min="0" step="0.5" placeholder="e.g., 3" />
+              </div>
+              <div>
+                <label class="footnote">Runs per week</label>
+                <input type="number" id="runsPerWeek" min="0" step="1" placeholder="e.g., 4" />
+              </div>
+              <div>
+                <label class="footnote">Mileage per week (km)</label>
+                <input type="number" id="mileagePerWeek" min="0" step="1" placeholder="e.g., 25" />
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="sectionTitle" style="margin-top:0;">Goals</div>
+            <textarea id="runningGoals" placeholder="E.g., 10K PB, return-to-run, marathon build, run pain-free..."></textarea>
+
+            <div class="hr"></div>
+
+            <div class="sectionTitle" style="margin-top:0;">Musculoskeletal injury history</div>
+            <div class="miniRow">
+              <div>
+                <label class="footnote">Past / current musculoskeletal injuries</label>
+                <textarea id="mskHistory" placeholder="Location, side, diagnosis, onset, rehab completed, current symptoms..."></textarea>
+              </div>
+              <div>
+                <label class="footnote">Stress fracture history</label>
+                <select id="stressFracture">
+                  <option value="">Select…</option>
+                  <option value="No">No</option>
+                  <option value="Yes - past">Yes (past)</option>
+                  <option value="Yes - current">Yes (current)</option>
+                  <option value="Unsure">Unsure</option>
+                </select>
+
+                <div style="height:10px"></div>
+
+                <label class="footnote">High-risk / needs medical clearance?</label>
+                <select id="medicalClearance">
+                  <option value="">Select…</option>
+                  <option value="Not required">Not required</option>
+                  <option value="Required (pending)">Required (pending)</option>
+                  <option value="Cleared by doctor">Cleared by doctor</option>
+                  <option value="Unsure">Unsure</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="sectionTitle" style="margin-top:0;">Waiver acknowledgment</div>
+            <div class="warnBox">
+              This screening is not a medical diagnosis. If you are at high risk, have unresolved pain, or are advised to obtain medical clearance,
+              you should consult a qualified healthcare professional before starting or progressing exercise.
+              Coaching guidance is provided based on the information you disclose.
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="twoCol">
+              <div>
+                <label class="footnote">Client declares information is accurate</label>
+                <select id="waiverAccurate">
+                  <option value="">Select…</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="footnote">Client agrees to proceed with coaching assessment</label>
+                <select id="waiverProceed">
+                  <option value="">Select…</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="twoCol">
+              <div>
+                <label class="footnote">Client Signature (type name)</label>
+                <input type="text" id="clientSignature" placeholder="e.g., Alex Tan" />
+              </div>
+              <div>
+                <label class="footnote">Signature Date</label>
+                <input type="date" id="signatureDate" />
+              </div>
+            </div>
+
+          </div>
+        </details>
+
         <div class="hr"></div>
 
         <div class="sectionTitle">Movement (Able / Unable + Limitations if Unable)</div>
         <div id="movementTable"></div>
-        <div class="footnote">Able/Unable are mutually exclusive. Limitations only activate when Unable is selected.</div>
 
         <div class="hr"></div>
 
@@ -468,15 +611,12 @@
     { key: "pronation", label: "Pronation inability", glyph: "⤵︎" }
   ];
 
-  const STORAGE_KEY = "runner_readiness_assessment_v5";
+  const STORAGE_KEY = "runner_readiness_assessment_v6";
 
   // =========================================================
   // STATE
   // =========================================================
-  const STATE = {
-    toggles: {},            // id -> bool
-    movementLimits: {}      // movementKey -> [strings]
-  };
+  const STATE = { toggles: {}, movementLimits: {} };
 
   // =========================================================
   // DOM helpers
@@ -498,9 +638,10 @@
   }
   function getVal(id){ return (document.getElementById(id)?.value ?? "").trim(); }
   function setVal(id, v){ const x=document.getElementById(id); if(x) x.value=v; }
+  function cssEsc(str){ return String(str).replace(/"/g, '\\"'); }
 
   // =========================================================
-  // Toggle primitives (for Able/Unable and L/R cells)
+  // Toggle primitives
   // =========================================================
   function getToggle(id){ return !!STATE.toggles[id]; }
   function setToggle(id, v){
@@ -508,7 +649,6 @@
     const btn = document.querySelector(`[data-tid="${cssEsc(id)}"]`);
     if(btn) btn.classList.toggle("on", !!v);
   }
-  function cssEsc(str){ return String(str).replace(/"/g, '\\"'); }
 
   function makeToggleButton(id, label, {variant="good", onToggle=null} = {}){
     const btn = el("div", {
@@ -538,18 +678,15 @@
       }
     });
 
-    // init UI
     setToggle(id, false);
-
     return btn;
   }
 
   // =========================================================
-  // Movement table (THIS ensures: Able/Unable clickable + limitations clickable when unable)
+  // Movement table
   // =========================================================
   function buildMovementTable(){
     const table = el("table", { class:"tbl" });
-
     const thead = el("thead");
     const trh = el("tr");
     trh.appendChild(el("th", { class:"metricCell", html:"Metric (tap to clear row)" }));
@@ -564,7 +701,6 @@
     MOVEMENT.forEach(m => {
       const ableId = `mv__${m.key}__able`;
       const unableId = `mv__${m.key}__unable`;
-
       if(!STATE.movementLimits[m.key]) STATE.movementLimits[m.key] = [];
 
       const tr = el("tr");
@@ -574,72 +710,59 @@
         const any = getToggle(ableId) || getToggle(unableId) || (STATE.movementLimits[m.key] || []).length;
         if(!any) return;
         if(!confirm(`Clear "${m.label}" (Able/Unable + limitations)?`)) return;
-
         setToggle(ableId, false);
         setToggle(unableId, false);
         STATE.movementLimits[m.key] = [];
         refreshLimitChips(m.key);
-
         setLimitCellEnabled(m.key, false);
         onAnyChange();
       });
       tr.appendChild(metricTd);
 
-      // Able button (mutually exclusive with unable)
       const ableTd = el("td");
-      const ableBtn = makeToggleButton(ableId, "Able", {
+      ableTd.appendChild(makeToggleButton(ableId, "Able", {
         variant: "good",
         onToggle: (on) => {
           if(on){
-            // turn off unable and clear limits
             setToggle(unableId, false);
             STATE.movementLimits[m.key] = [];
             refreshLimitChips(m.key);
             setLimitCellEnabled(m.key, false);
           }
         }
-      });
-      ableTd.appendChild(ableBtn);
+      }));
       tr.appendChild(ableTd);
 
-      // Unable button (mutually exclusive with able)
       const unableTd = el("td");
-      const unableBtn = makeToggleButton(unableId, "Unable", {
+      unableTd.appendChild(makeToggleButton(unableId, "Unable", {
         variant: "bad",
         onToggle: (on) => {
           if(on){
             setToggle(ableId, false);
-            setLimitCellEnabled(m.key, true);     // <-- enables clickable limitations
+            setLimitCellEnabled(m.key, true);
           }else{
             STATE.movementLimits[m.key] = [];
             refreshLimitChips(m.key);
-            setLimitCellEnabled(m.key, false);    // <-- disables clickable limitations
+            setLimitCellEnabled(m.key, false);
           }
         }
-      });
-      unableTd.appendChild(unableBtn);
+      }));
       tr.appendChild(unableTd);
 
-      // Limitations cell
       const limitTd = el("td", { id: `mv__${m.key}__limitsCell` });
-
       const hint = el("div", { class:"limitsHint", id:`mv__${m.key}__hint`, html:"Select <b>Unable</b> to enable limitations." });
       const chipWrap = el("div", { class:"chips", id: `mv__${m.key}__chips` });
 
-      // Render chips (always present, but disabled until Unable)
       m.limits.forEach(lab => {
         const chip = el("span", { class:"chip", "data-mkey": m.key, "data-lab": lab }, [
           el("span", { class:"dot" }),
           document.createTextNode(lab)
         ]);
         chip.addEventListener("click", () => {
-          // only clickable if unable
           if(!getToggle(unableId)) return;
-
           const selected = new Set(STATE.movementLimits[m.key] || []);
           if(selected.has(lab)) selected.delete(lab);
           else selected.add(lab);
-
           STATE.movementLimits[m.key] = Array.from(selected);
           refreshLimitChips(m.key);
           onAnyChange();
@@ -649,21 +772,17 @@
 
       limitTd.appendChild(hint);
       limitTd.appendChild(chipWrap);
-
       tr.appendChild(limitTd);
 
       tbody.appendChild(tr);
 
-      // initial state: disabled limitations
       setLimitCellEnabled(m.key, false);
       refreshLimitChips(m.key);
     });
 
     table.appendChild(tbody);
-
-    const container = document.getElementById("movementTable");
-    container.innerHTML = "";
-    container.appendChild(table);
+    document.getElementById("movementTable").innerHTML = "";
+    document.getElementById("movementTable").appendChild(table);
   }
 
   function refreshLimitChips(metricKey){
@@ -677,18 +796,16 @@
   }
 
   function setLimitCellEnabled(metricKey, enabled){
-    const cell = document.getElementById(`mv__${metricKey}__limitsCell`);
     const hint = document.getElementById(`mv__${metricKey}__hint`);
     const chips = document.getElementById(`mv__${metricKey}__chips`);
-    if(!cell || !chips || !hint) return;
-
+    if(!chips || !hint) return;
     chips.style.opacity = enabled ? "1" : ".45";
     chips.style.pointerEvents = enabled ? "auto" : "none";
     hint.style.display = enabled ? "none" : "block";
   }
 
   // =========================================================
-  // Strength / Foot tables (clickable Able/Unable per side)
+  // Strength / Foot tables
   // =========================================================
   function buildLRTable(containerId, prefix, items){
     const table = el("table", { class:"tbl" });
@@ -707,7 +824,6 @@
 
     items.forEach(it => {
       const tr = el("tr");
-
       const aL = `${prefix}__${it.key}__able__L`;
       const aR = `${prefix}__${it.key}__able__R`;
       const uL = `${prefix}__${it.key}__unable__L`;
@@ -744,18 +860,15 @@
     });
 
     table.appendChild(tbody);
-
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
-    container.appendChild(table);
+    document.getElementById(containerId).innerHTML = "";
+    document.getElementById(containerId).appendChild(table);
   }
 
   // =========================================================
-  // Ankle ROM block (prettier)
+  // Ankle ROM
   // =========================================================
   function buildAnkleBlock(){
     const grid = el("div", { class:"ankleGrid" });
-
     grid.appendChild(el("div", { class:"ankleCell ankleHead", html:"Ankle motion (inability)" }));
     grid.appendChild(el("div", { class:"ankleCell ankleHead", html:"Left" }));
     grid.appendChild(el("div", { class:"ankleCell ankleHead", html:"Right" }));
@@ -768,18 +881,14 @@
         el("div", { class:"glyph", html: esc(r.glyph) }),
         el("div", { html: esc(r.label) })
       ]);
-
-      // click label to clear row
       labelCell.addEventListener("click", () => {
         const any = getToggle(idL) || getToggle(idR);
         if(!any) return;
         if(!confirm(`Clear "${r.label}" (L/R)?`)) return;
-        setToggle(idL,false);
-        setToggle(idR,false);
+        setToggle(idL,false); setToggle(idR,false);
         onAnyChange();
       });
 
-      // Left / Right buttons
       const leftCell = el("div", { class:"ankleCell" });
       leftCell.appendChild(makeToggleButton(idL, "Toggle", { variant:"bad" }));
 
@@ -791,9 +900,45 @@
       grid.appendChild(rightCell);
     });
 
-    const container = document.getElementById("ankleRomBlock");
-    container.innerHTML = "";
-    container.appendChild(grid);
+    document.getElementById("ankleRomBlock").innerHTML = "";
+    document.getElementById("ankleRomBlock").appendChild(grid);
+  }
+
+  // =========================================================
+  // NEW: Waiver / training history collect + apply
+  // =========================================================
+  function collectWaiver(){
+    return {
+      yearsRunning: getVal("yearsRunning"),
+      runsPerWeek: getVal("runsPerWeek"),
+      mileagePerWeek: getVal("mileagePerWeek"),
+      runningGoals: getVal("runningGoals"),
+      mskHistory: getVal("mskHistory"),
+      stressFracture: getVal("stressFracture"),
+      medicalClearance: getVal("medicalClearance"),
+      waiverAccurate: getVal("waiverAccurate"),
+      waiverProceed: getVal("waiverProceed"),
+      clientSignature: getVal("clientSignature"),
+      signatureDate: getVal("signatureDate"),
+      waiverOpen: document.getElementById("waiverDetails")?.open ? "Yes" : "No"
+    };
+  }
+
+  function applyWaiver(w){
+    if(!w) return;
+    setVal("yearsRunning", w.yearsRunning || "");
+    setVal("runsPerWeek", w.runsPerWeek || "");
+    setVal("mileagePerWeek", w.mileagePerWeek || "");
+    setVal("runningGoals", w.runningGoals || "");
+    setVal("mskHistory", w.mskHistory || "");
+    setVal("stressFracture", w.stressFracture || "");
+    setVal("medicalClearance", w.medicalClearance || "");
+    setVal("waiverAccurate", w.waiverAccurate || "");
+    setVal("waiverProceed", w.waiverProceed || "");
+    setVal("clientSignature", w.clientSignature || "");
+    setVal("signatureDate", w.signatureDate || "");
+    const det = document.getElementById("waiverDetails");
+    if(det) det.open = (w.waiverOpen === "Yes");
   }
 
   // =========================================================
@@ -807,6 +952,7 @@
         caseId: getVal("caseId"),
         savedAtISO: new Date().toISOString()
       },
+      waiver: collectWaiver(),
       notes: getVal("notes"),
       toggles: STATE.toggles,
       movementLimits: STATE.movementLimits
@@ -820,8 +966,8 @@
     setVal("assessDate", data?.meta?.assessDate || "");
     setVal("caseId", data?.meta?.caseId || "");
     setVal("notes", data?.notes || "");
+    applyWaiver(data?.waiver || {});
 
-    // reset
     STATE.toggles = {};
     STATE.movementLimits = {};
 
@@ -833,14 +979,12 @@
       if(btn) btn.classList.toggle("on", !!v);
     }
 
-    // restore movement limitations
+    // restore movement limitations + enable chips if unable
     const ml = data?.movementLimits || {};
     MOVEMENT.forEach(m => {
       STATE.movementLimits[m.key] = Array.isArray(ml[m.key]) ? ml[m.key] : [];
       refreshLimitChips(m.key);
-
-      const unableId = `mv__${m.key}__unable`;
-      setLimitCellEnabled(m.key, !!STATE.toggles[unableId]);
+      setLimitCellEnabled(m.key, !!STATE.toggles[`mv__${m.key}__unable`]);
     });
 
     updateSavedPill(data?.meta?.savedAtISO || null);
@@ -872,19 +1016,28 @@
   function resetAll(){
     if(!confirm("Reset the form? This will clear everything on-screen.")) return;
 
+    // meta + notes
     setVal("clientName","");
     setVal("caseId","");
     setVal("notes","");
     document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
 
-    // clear toggles UI
+    // waiver fields
+    [
+      "yearsRunning","runsPerWeek","mileagePerWeek","runningGoals","mskHistory",
+      "stressFracture","medicalClearance","waiverAccurate","waiverProceed",
+      "clientSignature","signatureDate"
+    ].forEach(id => setVal(id,""));
+    document.getElementById("waiverDetails").open = false;
+
+    // toggles UI
     for(const id of Object.keys(STATE.toggles)){
       STATE.toggles[id] = false;
       const btn = document.querySelector(`[data-tid="${cssEsc(id)}"]`);
       if(btn) btn.classList.remove("on");
     }
 
-    // clear movement limits
+    // movement limits
     MOVEMENT.forEach(m => {
       STATE.movementLimits[m.key] = [];
       refreshLimitChips(m.key);
@@ -923,12 +1076,62 @@
     });
   }
 
+  function waiverSummaryLines(){
+    const lines = [];
+    const yrs = getVal("yearsRunning");
+    const rpw = getVal("runsPerWeek");
+    const mpw = getVal("mileagePerWeek");
+    const goals = getVal("runningGoals");
+    const msk = getVal("mskHistory");
+    const sf = getVal("stressFracture");
+    const mc = getVal("medicalClearance");
+    const acc = getVal("waiverAccurate");
+    const proc = getVal("waiverProceed");
+    const sig = getVal("clientSignature");
+    const sigd = getVal("signatureDate");
+
+    if(yrs || rpw || mpw){
+      lines.push("Training History");
+      lines.push(`- Years running: ${yrs || "—"}`);
+      lines.push(`- Runs/week: ${rpw || "—"}`);
+      lines.push(`- Mileage/week (km): ${mpw || "—"}`);
+      lines.push("");
+    }
+    if(goals){
+      lines.push("Goals");
+      lines.push(`- ${goals}`);
+      lines.push("");
+    }
+    if(msk || sf || mc){
+      lines.push("Injury / Medical");
+      if(msk) lines.push(`- MSK history: ${msk}`);
+      if(sf) lines.push(`- Stress fracture: ${sf}`);
+      if(mc) lines.push(`- Medical clearance: ${mc}`);
+      lines.push("");
+    }
+    if(acc || proc || sig || sigd){
+      lines.push("Waiver");
+      if(acc) lines.push(`- Accuracy confirmed: ${acc}`);
+      if(proc) lines.push(`- Proceed with assessment: ${proc}`);
+      if(sig) lines.push(`- Signature: ${sig}`);
+      if(sigd) lines.push(`- Signature date: ${sigd}`);
+      lines.push("");
+    }
+    return lines;
+  }
+
   function buildSummaryText(){
     const name = getVal("clientName") || "Client";
     const date = getVal("assessDate") || "Date not set";
     const lines = [];
     lines.push(`${name} • ${date}`);
     lines.push("");
+
+    // Waiver summary first
+    const wLines = waiverSummaryLines();
+    if(wLines.length){
+      lines.push(...wLines);
+    }
 
     lines.push("Movement");
     MOVEMENT.forEach(m => {
@@ -1010,29 +1213,42 @@
     document.getElementById("kpiLimit").textContent = limitCount;
     document.getElementById("kpiLR").textContent = lrCount;
 
-    // Flags
+    // Flags (include waiver risk flags)
     const tags = [];
+
+    // waiver risk flags
+    const sf = getVal("stressFracture");
+    const mc = getVal("medicalClearance");
+    const proc = getVal("waiverProceed");
+    if(sf && sf.includes("current")) tags.push({ text:`Waiver: Current stress fracture indicated`, level:"bad" });
+    if(mc && mc.includes("Required")) tags.push({ text:`Waiver: Medical clearance required (pending)`, level:"warn" });
+    if(proc === "No") tags.push({ text:`Waiver: Client did NOT agree to proceed`, level:"bad" });
+
     MOVEMENT.forEach(m => {
       const unable = getToggle(`mv__${m.key}__unable`);
       const limits = STATE.movementLimits[m.key] || [];
       if(unable) tags.push({ text:`Movement: ${m.label} = Unable`, level:"bad" });
       if(unable && limits.length) tags.push({ text:`${m.label} limitations: ${limits.join(", ")}`, level:"warn" });
     });
+
     STRENGTH.forEach(it => {
       const uL = getToggle(`st__${it.key}__unable__L`);
       const uR = getToggle(`st__${it.key}__unable__R`);
       if(uL||uR) tags.push({ text:`Strength: ${it.label} unable (${sideText(uL,uR)})`, level:"bad" });
     });
+
     FOOT.forEach(it => {
       const uL = getToggle(`ft__${it.key}__unable__L`);
       const uR = getToggle(`ft__${it.key}__unable__R`);
       if(uL||uR) tags.push({ text:`Foot: ${it.label} unable (${sideText(uL,uR)})`, level:"bad" });
     });
+
     ANKLE_ROM.forEach(r => {
       const L = getToggle(`ank__${r.key}__L`);
       const R = getToggle(`ank__${r.key}__R`);
       if(L||R) tags.push({ text:`Ankle ROM: ${r.label} (${sideText(L,R)})`, level:"bad" });
     });
+
     renderTags(tags);
 
     // Summary box
@@ -1045,7 +1261,7 @@
   }
 
   // =========================================================
-  // PDF export
+  // PDF export (includes waiver page)
   // =========================================================
   function pdfExport(){
     const data = collectAll();
@@ -1057,15 +1273,39 @@
     const date = data.meta.assessDate || "—";
     const caseId = data.meta.caseId || "—";
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(16);
     doc.text(title, 40, 54);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(11);
     doc.text(`Client: ${client}`, 40, 76);
     doc.text(`Date: ${date}`, 40, 92);
     doc.text(`Case ID: ${caseId}`, 40, 108);
+
+    // Waiver / History table
+    const w = data.waiver || {};
+    const waiverRows = [
+      ["Years running", w.yearsRunning || ""],
+      ["Runs/week", w.runsPerWeek || ""],
+      ["Mileage/week (km)", w.mileagePerWeek || ""],
+      ["Goals", w.runningGoals || ""],
+      ["MSK injury history", w.mskHistory || ""],
+      ["Stress fracture", w.stressFracture || ""],
+      ["Medical clearance", w.medicalClearance || ""],
+      ["Accuracy confirmed", w.waiverAccurate || ""],
+      ["Proceed with assessment", w.waiverProceed || ""],
+      ["Signature", w.clientSignature || ""],
+      ["Signature date", w.signatureDate || ""]
+    ];
+
+    doc.autoTable({
+      startY: 126,
+      head: [["Training History & Waiver", "Details"]],
+      body: waiverRows,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 4, valign:"top" },
+      headStyles: { fillColor: [30, 40, 70] },
+      theme: "grid",
+      margin: { left: 40, right: 40 },
+      columnStyles: { 0: { cellWidth: 170 }, 1: { cellWidth: 345 } }
+    });
 
     // Movement table
     const mvHead = ["Movement Metric","Able","Unable","Limitations (if unable)"];
@@ -1077,7 +1317,7 @@
     });
 
     doc.autoTable({
-      startY: 126,
+      startY: doc.lastAutoTable.finalY + 14,
       head: [mvHead],
       body: mvBody,
       styles: { font: "helvetica", fontSize: 9, cellPadding: 4 },
@@ -1144,11 +1384,10 @@
       margin: { left: 40, right: 40 }
     });
 
-    // Summary
+    // Summary page
     doc.addPage();
     doc.setFont("helvetica", "bold"); doc.setFontSize(13);
     doc.text("Summary", 40, 60);
-
     doc.setFont("helvetica", "normal"); doc.setFontSize(10);
     const summary = buildSummaryText();
     const sumLines = doc.splitTextToSize(summary, 515);
@@ -1159,7 +1398,7 @@
   }
 
   // =========================================================
-  // XLSX export
+  // XLSX export (includes waiver sheet)
   // =========================================================
   function xlsxExport(){
     const data = collectAll();
@@ -1174,6 +1413,24 @@
       ["Saved At (ISO)", data.meta.savedAtISO || ""]
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metaRows), "Meta");
+
+    // Waiver / History
+    const w = data.waiver || {};
+    const waiverAoa = [
+      ["Training History & Waiver", ""],
+      ["Years running", w.yearsRunning || ""],
+      ["Runs/week", w.runsPerWeek || ""],
+      ["Mileage/week (km)", w.mileagePerWeek || ""],
+      ["Goals", w.runningGoals || ""],
+      ["MSK injury history", w.mskHistory || ""],
+      ["Stress fracture", w.stressFracture || ""],
+      ["Medical clearance", w.medicalClearance || ""],
+      ["Accuracy confirmed", w.waiverAccurate || ""],
+      ["Proceed with assessment", w.waiverProceed || ""],
+      ["Signature", w.clientSignature || ""],
+      ["Signature date", w.signatureDate || ""]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(waiverAoa), "Waiver");
 
     // Movement
     const mvAoa = [["Metric","Able","Unable","Limitations (if unable)"]];
@@ -1258,13 +1515,16 @@
       if(autosave.checked) save();
     });
 
+    // any input/select/textarea changes update summary + autosave
     document.addEventListener("input", onAnyChange);
+    document.addEventListener("change", onAnyChange);
   }
 
   function init(){
     document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
+    document.getElementById("signatureDate").value = new Date().toISOString().slice(0,10);
 
-    buildMovementTable();                 // <-- Able/Unable clickable + limitations clickable when unable
+    buildMovementTable();
     buildLRTable("strengthTable", "st", STRENGTH);
     buildLRTable("footTable", "ft", FOOT);
     buildAnkleBlock();
