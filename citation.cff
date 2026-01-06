@@ -1,12 +1,14 @@
-cff-version: 1.0
+cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: Ng
-    given-names: Jun Wei
-    orcid: https://orcid.org/my-orcid?orcid=0000-0001-8634-1938
-title: "Runner Readiness Form"
-version: 1.0.1
-identifiers:
-  - type: doi
-    value: 10.5281/zenodo.1234
-date-released: 2026-1-06
+- family-names: "Ng"
+  given-names: "Jun Wei"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+- family-names: ""
+  given-names: ""
+  orcid: ""
+title: "Runner-Readiness-Assessment"
+version: 1.0.0
+doi: 10.5281/zenodo.1234
+date-released: 2026-01-05
+url: "https://github.com/ngjunwei777/Runner-Readiness-Assessment"
