@@ -4,15 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Runner Readiness Assessment - Gait Coach App</title>
+
+  <!-- jsPDF + autoTable for PDF export (CDN OK for GitHub Pages) -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     :root{
       --bg:#0b1220;
-      --card:#111a2e;
       --muted:#a9b4cc;
       --text:#eef3ff;
       --line:rgba(255,255,255,.10);
       --accent:#3dd6d0;
-      --accent2:#7aa6ff;
       --warn:#ffcc66;
       --bad:#ff6b6b;
       --good:#4ee59b;
@@ -22,7 +25,7 @@
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background: radial-gradient(1200px 700px at 15% 10%, rgba(61,214,208,.18), transparent 55%),
                   radial-gradient(900px 600px at 85% 20%, rgba(122,166,255,.18), transparent 55%),
                   linear-gradient(180deg, #070b14 0%, var(--bg) 55%, #070b14 100%);
@@ -35,16 +38,14 @@
       border-bottom:1px solid var(--line);
     }
     .wrap{max-width:1100px;margin:0 auto;padding:18px 16px;}
-    .topbar{
-      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    }
+    .topbar{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
     .brand{display:flex; gap:12px; align-items:center;}
     .logo{
       width:44px;height:44px;border-radius:14px;
       background: linear-gradient(135deg, rgba(61,214,208,.95), rgba(122,166,255,.85));
       box-shadow: var(--shadow);
     }
-    h1{font-size:18px;margin:0;letter-spacing:.2px}
+    h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
     .actions{display:flex;gap:10px;flex-wrap:wrap}
     button{
@@ -57,21 +58,11 @@
       transition:.15s ease;
     }
     button:hover{transform: translateY(-1px); background: rgba(255,255,255,.10)}
-    button.primary{
-      border-color: rgba(61,214,208,.35);
-      background: rgba(61,214,208,.16);
-    }
-    button.danger{
-      border-color: rgba(255,107,107,.35);
-      background: rgba(255,107,107,.14);
-    }
+    button.primary{border-color: rgba(61,214,208,.35); background: rgba(61,214,208,.16);}
+    button.danger{border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.14);}
 
     main{max-width:1100px;margin:0 auto;padding:18px 16px 80px;}
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:14px;
-    }
+    .grid{display:grid;grid-template-columns: 1.2fr .8fr;gap:14px;}
     @media (max-width: 980px){ .grid{grid-template-columns:1fr} header{position:relative} }
 
     .card{
@@ -86,7 +77,7 @@
       border-bottom:1px solid var(--line);
       display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-    .card .hd h2{margin:0;font-size:14.5px;letter-spacing:.2px}
+    .card .hd h2{margin:0;font-size:14.5px}
     .pill{
       font-size:12px;color:var(--muted);
       padding:6px 10px;border:1px solid var(--line);border-radius:999px;
@@ -101,11 +92,7 @@
       letter-spacing:.14em;
       text-transform:uppercase;
     }
-    .twoCol{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
+    .twoCol{display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
     @media (max-width: 680px){ .twoCol{grid-template-columns:1fr} }
 
     input[type="text"], input[type="date"], textarea{
@@ -118,7 +105,6 @@
       outline:none;
     }
     textarea{min-height:110px;resize:vertical}
-
     .hr{height:1px;background:var(--line);margin:12px 0;}
 
     /* Table */
@@ -126,9 +112,9 @@
       width:100%;
       border-collapse:separate;
       border-spacing:0;
-      overflow:hidden;
       border:1px solid var(--line);
       border-radius:16px;
+      overflow:hidden;
       background: rgba(255,255,255,.03);
     }
     .tbl th, .tbl td{
@@ -141,7 +127,6 @@
     .tbl th:last-child, .tbl td:last-child{border-right:none}
     .tbl tr:last-child td{border-bottom:none}
     .tbl thead th{
-      position:sticky; top:0;
       background: rgba(255,255,255,.05);
       color: var(--muted);
       font-weight:600;
@@ -150,32 +135,33 @@
       letter-spacing:.08em;
     }
     .metricCell{
-      font-weight:600;
-      color: var(--text);
-      width: 220px;
+      font-weight:700;
+      width: 240px;
       min-width: 180px;
       background: rgba(255,255,255,.02);
+      cursor:pointer;
+      user-select:none;
     }
 
+    /* Clickable checkbox cells */
+    .cellToggle{
+      cursor:pointer;
+      user-select:none;
+      transition: background .12s ease;
+    }
+    .cellToggle:hover{background: rgba(255,255,255,.05)}
+    .cellToggle:active{transform: scale(.99)}
     .checkWrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
+      display:flex; align-items:center; justify-content:center;
     }
     input[type="checkbox"]{
       width:18px;height:18px;
       accent-color: var(--accent);
       cursor:pointer;
-    }
-    .mini{
-      font-size:12px;color:var(--muted);
+      pointer-events:none; /* IMPORTANT: clicks handled by the cell */
     }
 
-    .kpi{
-      display:grid; grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
+    .kpi{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;}
     @media (max-width: 680px){ .kpi{grid-template-columns:1fr} }
     .stat{
       padding:12px;
@@ -222,13 +208,14 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>Runner Readiness Assessment</h1>
-          <div class="sub">Checkbox columns • Left/Right sides • Movement • Strength & Stability • Foot</div>
+          <div class="sub">Tap anywhere in a cell to toggle ✔ • Export JSON + PDF</div>
         </div>
       </div>
       <div class="actions">
         <button class="primary" id="btnSave">Save</button>
         <button id="btnLoad">Load</button>
         <button id="btnExport">Export JSON</button>
+        <button class="primary" id="btnPdf">Export PDF</button>
         <button id="btnPrint">Print</button>
         <button class="danger" id="btnReset">Reset</button>
       </div>
@@ -239,7 +226,7 @@
 <main>
   <div class="grid">
 
-    <!-- LEFT: FORM -->
+    <!-- LEFT -->
     <section class="card">
       <div class="hd">
         <h2>Assessment Form</h2>
@@ -250,11 +237,11 @@
         <div class="sectionTitle">Client details</div>
         <div class="twoCol">
           <div>
-            <label class="mini">Client Name</label>
+            <label class="footnote">Client Name</label>
             <input type="text" id="clientName" placeholder="e.g., Alex Tan" />
           </div>
           <div>
-            <label class="mini">Assessment Date</label>
+            <label class="footnote">Assessment Date</label>
             <input type="date" id="assessDate" />
           </div>
         </div>
@@ -278,7 +265,6 @@
 
         <div class="sectionTitle">Ankle ROM (Inability)</div>
         <div id="ankleRomTable"></div>
-        <div class="footnote">Tick L/R if the client shows inability in the listed ankle ROM pattern.</div>
 
         <div class="hr"></div>
 
@@ -288,7 +274,7 @@
       </div>
     </section>
 
-    <!-- RIGHT: SUMMARY -->
+    <!-- RIGHT -->
     <aside class="card">
       <div class="hd">
         <h2>Summary & Flags</h2>
@@ -322,14 +308,14 @@
             <input type="checkbox" id="autosave" />
             Autosave to device
           </label>
-          <label class="tag" title="Optional: give this assessment a simple ID">
+          <label class="tag" title="Optional case ID for exports">
             <span style="color:var(--muted)">Case ID</span>
             <input type="text" id="caseId" placeholder="e.g., AT-2026-01-06"
               style="width:180px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background: rgba(10,16,30,.65);color:var(--text);" />
           </label>
         </div>
         <div class="footnote">
-          Save/Load uses browser localStorage (works on GitHub Pages). Export downloads a JSON file.
+          PDF export works offline after first load (browser caches the CDN in many cases), but best practice is to keep internet on.
         </div>
       </div>
     </aside>
@@ -338,9 +324,9 @@
 </main>
 
 <script>
-  // =========================================================
-  // CONFIG: Metrics + checkbox columns (Left/Right)
-  // =========================================================
+  // =========================
+  // Metrics + Columns
+  // =========================
   const MOVEMENT = [
     { key: "toe_touch", label: "Toe Touch" },
     { key: "back_bend", label: "Back Bend" },
@@ -348,10 +334,6 @@
     { key: "single_leg_balance", label: "Single Leg Balance" },
     { key: "squat", label: "Squat" }
   ];
-
-  // Column checkboxes shown in the picture-style layout
-  // We implement them as: Able, Unable, Limitation (and Limitation has L/R).
-  // Able/Unable are not side-specific; Limitation is side-specific.
   const MOVEMENT_COLUMNS = [
     { key: "able", label: "Able", sides: false },
     { key: "unable", label: "Unable", sides: false },
@@ -364,7 +346,6 @@
     { key: "sl_sit_to_stand", label: "Single Leg Sit-to-Stand" },
     { key: "calf_raise", label: "Calf Raise" }
   ];
-
   const STRENGTH_COLUMNS = [
     { key: "able", label: "Able", sides: true },   // L/R
     { key: "unable", label: "Unable", sides: true } // L/R
@@ -375,7 +356,6 @@
     { key: "great_toe_extension", label: "Great Toe Extension" },
     { key: "great_toe_abduction", label: "Great Toe Abduction" }
   ];
-
   const FOOT_COLUMNS = [
     { key: "able", label: "Able", sides: true },   // L/R
     { key: "unable", label: "Unable", sides: true } // L/R
@@ -388,9 +368,9 @@
     { key: "pronation", label: "Pronation inability" }
   ];
 
-  // =========================================================
-  // UI Builders
-  // =========================================================
+  // =========================
+  // DOM helpers
+  // =========================
   function el(tag, attrs={}, children=[]){
     const n = document.createElement(tag);
     for(const [k,v] of Object.entries(attrs)){
@@ -401,26 +381,63 @@
     children.forEach(c => n.appendChild(c));
     return n;
   }
-
-  function makeCheckbox(id){
-    const cb = el("input", { type:"checkbox", id });
-    cb.addEventListener("change", onAnyChange);
-    return cb;
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
   }
 
-  function buildTable(containerId, titleKey, metrics, columns){
-    const table = el("table", { class:"tbl", "data-table": titleKey });
+  // =========================
+  // Clickable cell checkbox
+  // =========================
+  function makeCheckboxCell(id){
+    const cb = el("input", { type:"checkbox", id });
+    cb.addEventListener("change", onAnyChange);
 
-    // header
+    const cell = el("td", { class:"cellToggle", "data-cb": id }, [
+      el("div", { class:"checkWrap" }, [cb])
+    ]);
+
+    // Whole cell toggles the checkbox
+    cell.addEventListener("click", (e) => {
+      // Don't double-toggle if click originates from checkbox (rare due to pointer-events:none)
+      const box = document.getElementById(id);
+      box.checked = !box.checked;
+      box.dispatchEvent(new Event("change", { bubbles:true }));
+    });
+
+    // Keyboard accessibility: focus + space/enter
+    cell.tabIndex = 0;
+    cell.setAttribute("role", "checkbox");
+    cell.setAttribute("aria-checked", "false");
+    cell.addEventListener("keydown", (e) => {
+      if(e.key === " " || e.key === "Enter"){
+        e.preventDefault();
+        const box = document.getElementById(id);
+        box.checked = !box.checked;
+        box.dispatchEvent(new Event("change", { bubbles:true }));
+      }
+    });
+
+    // Sync aria
+    cb.addEventListener("change", () => {
+      cell.setAttribute("aria-checked", cb.checked ? "true" : "false");
+    });
+
+    return cell;
+  }
+
+  function buildTable(containerId, prefix, metrics, columns){
+    const table = el("table", { class:"tbl", "data-table": prefix });
+
     const thead = el("thead");
     const trh = el("tr");
-
-    trh.appendChild(el("th", { class:"metricCell", html:"Metric" }));
+    trh.appendChild(el("th", { class:"metricCell", html:"Metric (tap name to clear row)" }));
 
     columns.forEach(col => {
       if(col.sides){
-        trh.appendChild(el("th", { html: `${escapeHtml(col.label)}<div class="mini">L</div>` }));
-        trh.appendChild(el("th", { html: `${escapeHtml(col.label)}<div class="mini">R</div>` }));
+        trh.appendChild(el("th", { html:`${escapeHtml(col.label)}<div style="color:var(--muted);font-size:11px;margin-top:3px;">L</div>` }));
+        trh.appendChild(el("th", { html:`${escapeHtml(col.label)}<div style="color:var(--muted);font-size:11px;margin-top:3px;">R</div>` }));
       }else{
         trh.appendChild(el("th", { html: escapeHtml(col.label) }));
       }
@@ -429,30 +446,32 @@
     thead.appendChild(trh);
     table.appendChild(thead);
 
-    // body
     const tbody = el("tbody");
     metrics.forEach(m => {
-      const tr = el("tr");
-      tr.appendChild(el("td", { class:"metricCell", html: escapeHtml(m.label) }));
+      const tr = el("tr", { "data-metric": m.key, "data-prefix": prefix });
+
+      const metricTd = el("td", { class:"metricCell", html: escapeHtml(m.label) });
+
+      // Make metric cell clickable: clears row (nice UX)
+      metricTd.addEventListener("click", () => {
+        const ids = getRowCheckboxIds(prefix, m.key, columns);
+        const anyChecked = ids.some(id => document.getElementById(id)?.checked);
+        if(!anyChecked) return;
+        if(!confirm(`Clear all checks for "${m.label}"?`)) return;
+        ids.forEach(id => {
+          const cb = document.getElementById(id);
+          if(cb){ cb.checked = false; cb.dispatchEvent(new Event("change", {bubbles:true})); }
+        });
+      });
+
+      tr.appendChild(metricTd);
 
       columns.forEach(col => {
         if(col.sides){
-          // Left
-          const idL = `${titleKey}__${m.key}__${col.key}__L`;
-          const tdL = el("td");
-          tdL.appendChild(el("div", { class:"checkWrap" }, [makeCheckbox(idL)]));
-          tr.appendChild(tdL);
-
-          // Right
-          const idR = `${titleKey}__${m.key}__${col.key}__R`;
-          const tdR = el("td");
-          tdR.appendChild(el("div", { class:"checkWrap" }, [makeCheckbox(idR)]));
-          tr.appendChild(tdR);
+          tr.appendChild(makeCheckboxCell(`${prefix}__${m.key}__${col.key}__L`));
+          tr.appendChild(makeCheckboxCell(`${prefix}__${m.key}__${col.key}__R`));
         }else{
-          const id = `${titleKey}__${m.key}__${col.key}`;
-          const td = el("td");
-          td.appendChild(el("div", { class:"checkWrap" }, [makeCheckbox(id)]));
-          tr.appendChild(td);
+          tr.appendChild(makeCheckboxCell(`${prefix}__${m.key}__${col.key}`));
         }
       });
 
@@ -466,12 +485,25 @@
     container.appendChild(table);
   }
 
+  function getRowCheckboxIds(prefix, metricKey, columns){
+    const ids = [];
+    columns.forEach(col => {
+      if(col.sides){
+        ids.push(`${prefix}__${metricKey}__${col.key}__L`);
+        ids.push(`${prefix}__${metricKey}__${col.key}__R`);
+      }else{
+        ids.push(`${prefix}__${metricKey}__${col.key}`);
+      }
+    });
+    return ids;
+  }
+
   function buildAnkleRomTable(){
     const table = el("table", { class:"tbl", "data-table":"ankle" });
 
     const thead = el("thead");
     const trh = el("tr");
-    trh.appendChild(el("th", { class:"metricCell", html:"Ankle ROM Pattern (Inability)" }));
+    trh.appendChild(el("th", { class:"metricCell", html:"Ankle ROM Pattern (tap name to clear row)" }));
     trh.appendChild(el("th", { html:"Left" }));
     trh.appendChild(el("th", { html:"Right" }));
     thead.appendChild(trh);
@@ -479,55 +511,44 @@
 
     const tbody = el("tbody");
     ANKLE_ROM_INABILITY.forEach(r => {
-      const tr = el("tr");
-      tr.appendChild(el("td", { class:"metricCell", html: escapeHtml(r.label) }));
+      const tr = el("tr", { "data-ankle": r.key });
 
-      const idL = `ankle__${r.key}__L`;
-      const tdL = el("td");
-      tdL.appendChild(el("div", { class:"checkWrap" }, [makeCheckbox(idL)]));
-      tr.appendChild(tdL);
+      const metricTd = el("td", { class:"metricCell", html: escapeHtml(r.label) });
+      metricTd.addEventListener("click", () => {
+        const idL = `ankle__${r.key}__L`;
+        const idR = `ankle__${r.key}__R`;
+        const any = (document.getElementById(idL)?.checked || document.getElementById(idR)?.checked);
+        if(!any) return;
+        if(!confirm(`Clear all checks for "${r.label}"?`)) return;
+        [idL,idR].forEach(id => {
+          const cb = document.getElementById(id);
+          if(cb){ cb.checked = false; cb.dispatchEvent(new Event("change", {bubbles:true})); }
+        });
+      });
 
-      const idR = `ankle__${r.key}__R`;
-      const tdR = el("td");
-      tdR.appendChild(el("div", { class:"checkWrap" }, [makeCheckbox(idR)]));
-      tr.appendChild(tdR);
+      tr.appendChild(metricTd);
+      tr.appendChild(makeCheckboxCell(`ankle__${r.key}__L`));
+      tr.appendChild(makeCheckboxCell(`ankle__${r.key}__R`));
 
       tbody.appendChild(tr);
     });
 
     table.appendChild(tbody);
+
     const container = document.getElementById("ankleRomTable");
     container.innerHTML = "";
     container.appendChild(table);
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[m]));
-  }
+  // =========================
+  // Data model
+  // =========================
+  const STORAGE_KEY = "runner_readiness_assessment_checkbox_v3";
 
-  // =========================================================
-  // Data handling
-  // =========================================================
-  const STORAGE_KEY = "runner_readiness_assessment_checkbox_v2";
-
-  function collectAll(){
-    const data = {
-      meta: {
-        clientName: getVal("clientName"),
-        assessDate: getVal("assessDate"),
-        caseId: getVal("caseId"),
-        savedAtISO: new Date().toISOString()
-      },
-      notes: getVal("notes"),
-      movement: collectTable("movement", MOVEMENT, MOVEMENT_COLUMNS),
-      strength: collectTable("strength", STRENGTH, STRENGTH_COLUMNS),
-      foot: collectTable("foot", FOOT, FOOT_COLUMNS),
-      ankle: collectAnkle()
-    };
-    return data;
-  }
+  function getVal(id){ return (document.getElementById(id)?.value ?? "").trim(); }
+  function setVal(id, v){ const el = document.getElementById(id); if(el) el.value = v; }
+  function getChecked(id){ return !!document.getElementById(id)?.checked; }
+  function setChecked(id, v){ const el = document.getElementById(id); if(el) el.checked = !!v; }
 
   function collectTable(prefix, metrics, columns){
     const rows = {};
@@ -556,26 +577,25 @@
     return out;
   }
 
-  function applyAll(data){
-    if(!data) return;
-
-    setVal("clientName", data?.meta?.clientName || "");
-    setVal("assessDate", data?.meta?.assessDate || "");
-    setVal("caseId", data?.meta?.caseId || "");
-    setVal("notes", data?.notes || "");
-
-    applyTable("movement", MOVEMENT, MOVEMENT_COLUMNS, data?.movement || {});
-    applyTable("strength", STRENGTH, STRENGTH_COLUMNS, data?.strength || {});
-    applyTable("foot", FOOT, FOOT_COLUMNS, data?.foot || {});
-    applyAnkle(data?.ankle || {});
-
-    updateSavedPill(data?.meta?.savedAtISO || null);
-    updateSummary();
+  function collectAll(){
+    return {
+      meta: {
+        clientName: getVal("clientName"),
+        assessDate: getVal("assessDate"),
+        caseId: getVal("caseId"),
+        savedAtISO: new Date().toISOString()
+      },
+      notes: getVal("notes"),
+      movement: collectTable("movement", MOVEMENT, MOVEMENT_COLUMNS),
+      strength: collectTable("strength", STRENGTH, STRENGTH_COLUMNS),
+      foot: collectTable("foot", FOOT, FOOT_COLUMNS),
+      ankle: collectAnkle()
+    };
   }
 
   function applyTable(prefix, metrics, columns, saved){
     metrics.forEach(m => {
-      const row = saved[m.key] || {};
+      const row = saved?.[m.key] || {};
       columns.forEach(col => {
         if(col.sides){
           setChecked(`${prefix}__${m.key}__${col.key}__L`, !!row[`${col.key}_L`]);
@@ -594,54 +614,81 @@
     });
   }
 
-  function getVal(id){ return (document.getElementById(id)?.value ?? "").trim(); }
-  function setVal(id, v){ const el = document.getElementById(id); if(el) el.value = v; }
-  function getChecked(id){ return !!document.getElementById(id)?.checked; }
-  function setChecked(id, v){ const el = document.getElementById(id); if(el) el.checked = !!v; }
+  function applyAll(data){
+    if(!data) return;
+    setVal("clientName", data?.meta?.clientName || "");
+    setVal("assessDate", data?.meta?.assessDate || "");
+    setVal("caseId", data?.meta?.caseId || "");
+    setVal("notes", data?.notes || "");
+    applyTable("movement", MOVEMENT, MOVEMENT_COLUMNS, data?.movement || {});
+    applyTable("strength", STRENGTH, STRENGTH_COLUMNS, data?.strength || {});
+    applyTable("foot", FOOT, FOOT_COLUMNS, data?.foot || {});
+    applyAnkle(data?.ankle || {});
+    updateSavedPill(data?.meta?.savedAtISO || null);
+    updateSummary();
+  }
 
-  // =========================================================
-  // Summary + Flags
-  // =========================================================
+  // =========================
+  // Summary
+  // =========================
+  function sideText(L, R){
+    if(L && R) return "L+R";
+    if(L) return "L";
+    if(R) return "R";
+    return "—";
+  }
+
+  function renderTags(tags){
+    const box = document.getElementById("flagTags");
+    box.innerHTML = "";
+    if(!tags.length){
+      box.innerHTML = `<span class="sub">No flags yet. Tick “Unable”, “Limitation”, or ankle ROM inability.</span>`;
+      return;
+    }
+    tags.slice(0, 16).forEach(t => {
+      const span = document.createElement("span");
+      span.className = "tag";
+      const dot = document.createElement("span");
+      dot.className = `dot ${t.level}`;
+      span.appendChild(dot);
+      span.appendChild(document.createTextNode(t.text));
+      box.appendChild(span);
+    });
+  }
+
   function updateSummary(){
-    // Count checks
     const allChecks = [...document.querySelectorAll("input[type='checkbox']")];
     const checked = allChecks.filter(x => x.checked);
-    const left = checked.filter(x => x.id.endsWith("__L") || x.id.endsWith("_L") || x.id.endsWith("__L")).length;
-    const right = checked.filter(x => x.id.endsWith("__R") || x.id.endsWith("_R") || x.id.endsWith("__R")).length;
+
+    const left = checked.filter(x => x.id.endsWith("__L") || x.id.endsWith("_L")).length;
+    const right = checked.filter(x => x.id.endsWith("__R") || x.id.endsWith("_R")).length;
 
     document.getElementById("kpiChecked").textContent = checked.length;
     document.getElementById("kpiLeft").textContent = left;
     document.getElementById("kpiRight").textContent = right;
 
-    // Build flags (mostly unable/inability and limitations)
     const tags = [];
 
-    // Movement flags: unable or limitation sides
     MOVEMENT.forEach(m => {
       const unable = getChecked(`movement__${m.key}__unable`);
       const limL = getChecked(`movement__${m.key}__limitation__L`);
       const limR = getChecked(`movement__${m.key}__limitation__R`);
       if(unable) tags.push({text:`Movement: ${m.label} = Unable`, level:"bad"});
-      if(limL || limR){
-        tags.push({text:`Movement: ${m.label} limitation (${sideText(limL, limR)})`, level:"warn"});
-      }
+      if(limL || limR) tags.push({text:`Movement: ${m.label} limitation (${sideText(limL, limR)})`, level:"warn"});
     });
 
-    // Strength flags: unable L/R
     STRENGTH.forEach(m => {
       const uL = getChecked(`strength__${m.key}__unable__L`);
       const uR = getChecked(`strength__${m.key}__unable__R`);
       if(uL || uR) tags.push({text:`Strength: ${m.label} unable (${sideText(uL,uR)})`, level:"bad"});
     });
 
-    // Foot flags: unable L/R
     FOOT.forEach(m => {
       const uL = getChecked(`foot__${m.key}__unable__L`);
       const uR = getChecked(`foot__${m.key}__unable__R`);
       if(uL || uR) tags.push({text:`Foot: ${m.label} unable (${sideText(uL,uR)})`, level:"bad"});
     });
 
-    // Ankle inability flags
     ANKLE_ROM_INABILITY.forEach(r => {
       const iL = getChecked(`ankle__${r.key}__L`);
       const iR = getChecked(`ankle__${r.key}__R`);
@@ -650,7 +697,6 @@
 
     renderTags(tags);
 
-    // Summary text
     const data = collectAll();
     const lines = [];
     const header = [data.meta.clientName || "Client", data.meta.assessDate || "Date not set"].filter(Boolean).join(" • ");
@@ -711,47 +757,15 @@
     document.getElementById("summaryBox").textContent = lines.join("\n");
   }
 
-  function sideText(L, R){
-    if(L && R) return "L+R";
-    if(L) return "L";
-    if(R) return "R";
-    return "—";
-  }
-
-  function renderTags(tags){
-    const box = document.getElementById("flagTags");
-    box.innerHTML = "";
-    if(!tags.length){
-      box.innerHTML = `<span class="sub">No flags yet. Tick “Unable”, “Limitation”, or ankle ROM inability.</span>`;
-      return;
-    }
-    tags.slice(0, 16).forEach(t => {
-      const span = document.createElement("span");
-      span.className = "tag";
-      const dot = document.createElement("span");
-      dot.className = `dot ${t.level}`;
-      span.appendChild(dot);
-      span.appendChild(document.createTextNode(t.text));
-      box.appendChild(span);
-    });
-    if(tags.length > 16){
-      const more = document.createElement("div");
-      more.className = "footnote";
-      more.textContent = `+ ${tags.length - 16} more… (see summary)`;
-      box.appendChild(more);
-    }
-  }
-
+  // =========================
+  // Save / Load / Export
+  // =========================
   function updateSavedPill(iso){
     const pill = document.getElementById("lastSaved");
     if(!iso){ pill.textContent = "Not saved yet"; return; }
-    const d = new Date(iso);
-    pill.textContent = `Saved: ${d.toLocaleString()}`;
+    pill.textContent = `Saved: ${new Date(iso).toLocaleString()}`;
   }
 
-  // =========================================================
-  // Save / Load / Export
-  // =========================================================
   function save(){
     const data = collectAll();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -760,16 +774,9 @@
 
   function load(){
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){
-      alert("No saved assessment found on this device yet.");
-      return;
-    }
-    try{
-      const data = JSON.parse(raw);
-      applyAll(data);
-    }catch(e){
-      alert("Saved data was corrupted or unreadable.");
-    }
+    if(!raw){ alert("No saved assessment found on this device yet."); return; }
+    try{ applyAll(JSON.parse(raw)); }
+    catch(e){ alert("Saved data was corrupted or unreadable."); }
   }
 
   function resetAll(){
@@ -793,20 +800,153 @@
     URL.revokeObjectURL(url);
   }
 
-  // =========================================================
+  // =========================
+  // PDF Export
+  // =========================
+  function pdfExport(){
+    const data = collectAll();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+    const title = "Runner Readiness Assessment";
+    const client = data.meta.clientName || "—";
+    const date = data.meta.assessDate || "—";
+    const caseId = data.meta.caseId || "—";
+
+    let y = 48;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(title, 40, y);
+
+    y += 18;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`Client: ${client}`, 40, y);
+    y += 14;
+    doc.text(`Date: ${date}`, 40, y);
+    y += 14;
+    doc.text(`Case ID: ${caseId}`, 40, y);
+
+    // Helper: build tables for autoTable
+    function buildRows(prefix, metrics, columns){
+      const head = ["Metric"];
+      columns.forEach(c => {
+        if(c.sides){ head.push(`${c.label} (L)`); head.push(`${c.label} (R)`); }
+        else head.push(c.label);
+      });
+
+      const body = metrics.map(m => {
+        const row = [m.label];
+        columns.forEach(c => {
+          if(c.sides){
+            row.push(data[prefix]?.[m.key]?.[`${c.key}_L`] ? "✓" : "");
+            row.push(data[prefix]?.[m.key]?.[`${c.key}_R`] ? "✓" : "");
+          }else{
+            row.push(data[prefix]?.[m.key]?.[c.key] ? "✓" : "");
+          }
+        });
+        return row;
+      });
+
+      return { head, body };
+    }
+
+    // Movement
+    const mv = buildRows("movement", MOVEMENT, MOVEMENT_COLUMNS);
+    doc.autoTable({
+      startY: y + 18,
+      head: [mv.head],
+      body: mv.body,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 4 },
+      headStyles: { fillColor: [30, 40, 70] },
+      theme: "grid",
+      margin: { left: 40, right: 40 }
+    });
+
+    // Strength
+    const y2 = doc.lastAutoTable.finalY + 14;
+    const st = buildRows("strength", STRENGTH, STRENGTH_COLUMNS);
+    doc.autoTable({
+      startY: y2,
+      head: [st.head],
+      body: st.body,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 4 },
+      headStyles: { fillColor: [30, 40, 70] },
+      theme: "grid",
+      margin: { left: 40, right: 40 }
+    });
+
+    // Foot
+    const y3 = doc.lastAutoTable.finalY + 14;
+    const ft = buildRows("foot", FOOT, FOOT_COLUMNS);
+    doc.autoTable({
+      startY: y3,
+      head: [ft.head],
+      body: ft.body,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 4 },
+      headStyles: { fillColor: [30, 40, 70] },
+      theme: "grid",
+      margin: { left: 40, right: 40 }
+    });
+
+    // Ankle ROM inability
+    const y4 = doc.lastAutoTable.finalY + 14;
+    const ankleHead = ["Ankle ROM Pattern (Inability)", "Left", "Right"];
+    const ankleBody = ANKLE_ROM_INABILITY.map(r => ([
+      r.label,
+      data.ankle?.[r.key]?.L ? "✓" : "",
+      data.ankle?.[r.key]?.R ? "✓" : ""
+    ]));
+
+    doc.autoTable({
+      startY: y4,
+      head: [ankleHead],
+      body: ankleBody,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 4 },
+      headStyles: { fillColor: [30, 40, 70] },
+      theme: "grid",
+      margin: { left: 40, right: 40 }
+    });
+
+    // Notes + Summary (new page if needed)
+    const summary = document.getElementById("summaryBox").textContent || "";
+    const notes = data.notes || "";
+
+    doc.addPage();
+    doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+    doc.text("Summary", 40, 60);
+
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+    const sumLines = doc.splitTextToSize(summary, 515);
+    doc.text(sumLines, 40, 80);
+
+    const yNotes = 80 + (sumLines.length * 12) + 18;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+    doc.text("Coach Notes", 40, yNotes);
+
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+    const noteLines = doc.splitTextToSize(notes || "—", 515);
+    doc.text(noteLines, 40, yNotes + 20);
+
+    const fileBase = (caseId !== "—" ? caseId : (client !== "—" ? client : "assessment"))
+      .replace(/[^\w\-]+/g, "_");
+    doc.save(`${fileBase}_runner_readiness_${new Date().toISOString().slice(0,10)}.pdf`);
+  }
+
+  // =========================
   // Events
-  // =========================================================
+  // =========================
   function onAnyChange(){
     updateSummary();
-    if(document.getElementById("autosave").checked){
-      save();
-    }
+    if(document.getElementById("autosave").checked) save();
   }
 
   function wire(){
     document.getElementById("btnSave").addEventListener("click", save);
     document.getElementById("btnLoad").addEventListener("click", load);
     document.getElementById("btnExport").addEventListener("click", exportJson);
+    document.getElementById("btnPdf").addEventListener("click", pdfExport);
     document.getElementById("btnPrint").addEventListener("click", () => window.print());
     document.getElementById("btnReset").addEventListener("click", resetAll);
 
@@ -817,25 +957,18 @@
       if(autosave.checked) save();
     });
 
-    // Inputs (text/date/textarea)
-    document.addEventListener("input", () => {
-      updateSummary();
-      if(document.getElementById("autosave").checked){
-        save();
-      }
-    });
+    document.addEventListener("input", onAnyChange);
   }
 
   function init(){
-    // Build the tables
+    // Build tables
     buildTable("movementTable", "movement", MOVEMENT, MOVEMENT_COLUMNS);
     buildTable("strengthTable", "strength", STRENGTH, STRENGTH_COLUMNS);
     buildTable("footTable", "foot", FOOT, FOOT_COLUMNS);
     buildAnkleRomTable();
 
     // default date today
-    const iso = new Date().toISOString().slice(0,10);
-    document.getElementById("assessDate").value = iso;
+    document.getElementById("assessDate").value = new Date().toISOString().slice(0,10);
 
     wire();
     updateSummary();
